@@ -37,7 +37,7 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Models.Storage>> GetTeams()
+        public async Task<List<Models.Storage>> GetStorages()
         {
             List<Models.Storage> storages = await _context.Storages.ToListAsync();
             return storages;

@@ -16,5 +16,7 @@ namespace InventoryManagementAPI.Data
 
         public DbSet<InventoryManagementAPI.Models.Product> Products { get; set; } = default!;
         public DbSet<InventoryManagementAPI.Models.Storage> Storages { get; set; } = default!;
+
+        public DbSet<InventoryManagementAPI.Models.User> Users { get; set; } = default!;
     }
 }
