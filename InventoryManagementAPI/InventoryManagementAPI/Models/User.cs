@@ -19,6 +19,15 @@ namespace InventoryManagementAPI.Models
         [PersonalData]
         public string LastName { get; set; }
 
+
+        [JsonPropertyName("userName")]
+        [PersonalData]
+        public string UserName { get; set; }
+
+        [JsonPropertyName("password")]
+        [PersonalData]
+        public string Password { get; set; }
+
         [JsonPropertyName("employeeNumber")]
         [PersonalData]
         public string EmployeeNumber { get; set; }
