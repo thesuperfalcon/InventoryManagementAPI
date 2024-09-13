@@ -3,6 +3,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using InventoryManagementAPI.Data;
+using InventoryManagementAPI.Models;
+using Microsoft.AspNetCore.Identity;
+using InventoryManagementAPI.Models;
+using InventoryManagementAPI.Data;
 
 namespace InventoryManagementAPI
 {
@@ -20,8 +24,14 @@ namespace InventoryManagementAPI
             builder.Services.AddDbContext<Data.InventoryManagementAPIContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddTransient<Data.ProductManager>();
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
+
+            //builder.Services.AddIdentity<User, IdentityRole>();
+            
+            //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
+
+			//builder.Services.AddDefaultTokenProviders();
+			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+			builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();

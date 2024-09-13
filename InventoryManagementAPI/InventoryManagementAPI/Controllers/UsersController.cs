@@ -14,11 +14,14 @@ namespace InventoryManagementAPI.Controllers
 
         private readonly InventoryManagementAPIContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
+        private readonly UserManager<User> _userManager;
 
-        public UsersController(InventoryManagementAPIContext context)
+        public UsersController(InventoryManagementAPIContext context, UserManager<User> userManager )
         {
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
+            _userManager = userManager;
+
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.User user)
@@ -26,8 +29,11 @@ namespace InventoryManagementAPI.Controllers
             
             user.Id = Guid.NewGuid().ToString();
             user.UserName = user.EmployeeNumber;
-            user.Password = "Admin123!";
-           // user.PasswordHash = _passwordHasher.HashPassword(user, user.PasswordHash); //    _passwordHasher.HashPassword(user, user.PasswordHash);
+            user.NormalizedUserName = user.EmployeeNumber;
+            user.RoleId = null;
+            //user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
+            user.EmailConfirmed = false;
+            await _userManager.GenerateEmailConfirmationTokenAsync(user);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return Ok();

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace InventoryManagementAPI.Models
 {
     [Table("AspNetUsers")]
-    public class User
+    public class User : IdentityUser
     {
         [JsonPropertyName("id")]
         [PersonalData]
@@ -26,7 +26,7 @@ namespace InventoryManagementAPI.Models
 
         [JsonPropertyName("password")]
         [PersonalData]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         [JsonPropertyName("employeeNumber")]
         [PersonalData]
