@@ -31,8 +31,9 @@ namespace InventoryManagementAPI.Controllers
             user.UserName = user.EmployeeNumber;
             user.NormalizedUserName = user.EmployeeNumber;
             user.RoleId = null;
-            //user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
+            user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
+            user.TwoFactorEnabled = false;
             await _userManager.GenerateEmailConfirmationTokenAsync(user);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();

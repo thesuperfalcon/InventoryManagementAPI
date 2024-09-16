@@ -4,13 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace InventoryManagementAPI.Models
 {
-    [Table("AspNetUsers")]
     public class User : IdentityUser
     {
-        [JsonPropertyName("id")]
-        [PersonalData]
-        public string Id { get; set; }
-
         [JsonPropertyName("firstName")]
         [PersonalData]
         public string FirstName { get; set; }
@@ -18,15 +13,6 @@ namespace InventoryManagementAPI.Models
         [JsonPropertyName("lastName")]
         [PersonalData]
         public string LastName { get; set; }
-
-
-        [JsonPropertyName("userName")]
-        [PersonalData]
-        public string UserName { get; set; }
-
-        [JsonPropertyName("password")]
-        [PersonalData]
-        public string PasswordHash { get; set; }
 
         [JsonPropertyName("employeeNumber")]
         [PersonalData]
@@ -41,30 +27,36 @@ namespace InventoryManagementAPI.Models
         public DateTime Created { get; set; }
 
         [JsonPropertyName("updated")]
+        [JsonIgnore]
         [PersonalData]
         public DateTime Updated { get; set; }
 
         [JsonPropertyName("accessFailedCount")]
-        [PersonalData]
+		[JsonIgnore]
+		[PersonalData]
         public int AccessFailedCount { get; set; }
 
         [JsonPropertyName("emailConfirmed")]
-        [PersonalData]
+		[JsonIgnore]
+		[PersonalData]
         public bool EmailConfirmed { get; set; }
 
 
         [JsonPropertyName("phoneNumberConfirmed")]
-        [PersonalData]
+		[JsonIgnore]
+		[PersonalData]
         public bool PhoneNumberConfirmed { get; set; }
 
 
         [JsonPropertyName("twoFactorEnabled")]
-        [PersonalData]
+		[JsonIgnore]
+		[PersonalData]
         public bool TwoFactorEnabled { get; set; }
 
 
         [JsonPropertyName("lockoutEnabled")]
-        [PersonalData]
+		[JsonIgnore]
+		[PersonalData]
         public bool LockoutEnabled { get; set; }
     }
 }

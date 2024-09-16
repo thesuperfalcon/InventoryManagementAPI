@@ -7,6 +7,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using InventoryManagementAPI.Models;
 using InventoryManagementAPI.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace InventoryManagementAPI
 {
@@ -25,7 +26,12 @@ namespace InventoryManagementAPI
             builder.Services.AddTransient<Data.ProductManager>();
             builder.Services.AddControllers();
 
-            //builder.Services.AddIdentity<User, IdentityRole>();
+            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+            }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
             
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 
