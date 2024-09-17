@@ -28,7 +28,7 @@ namespace InventoryManagementAPI.Controllers
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody] Models.Product products)
         {
             _context.Update(products);
