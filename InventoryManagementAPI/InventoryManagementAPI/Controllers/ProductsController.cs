@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -40,6 +42,7 @@ namespace InventoryManagementAPI.Controllers
         public async Task<List<Models.Product>> GetProducts()
         {
             List<Models.Product> products = await _context.Products.ToListAsync();
+           
             return products;
         }
 

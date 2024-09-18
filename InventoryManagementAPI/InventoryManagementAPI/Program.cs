@@ -1,13 +1,8 @@
-
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
-using InventoryManagementAPI.Models;
-using InventoryManagementAPI.Data;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace InventoryManagementAPI
 {
@@ -26,18 +21,29 @@ namespace InventoryManagementAPI
             builder.Services.AddTransient<Data.ProductManager>();
             builder.Services.AddControllers();
 
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                //options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Do not use reference handling
+                options.JsonSerializerOptions.WriteIndented = true; // Optional: for readability
+            });
+
+            //builder.Services.AddControllers()
+            //.AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            //});            
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
-            
+
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 
-			//builder.Services.AddDefaultTokenProviders();
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-			builder.Services.AddEndpointsApiExplorer();
+            //builder.Services.AddDefaultTokenProviders();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();

@@ -1,6 +1,9 @@
 ﻿using InventoryManagementAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -33,11 +36,52 @@ namespace InventoryManagementAPI.Controllers
 		}
 
 		[HttpGet]
-		public async Task<List<Models.InventoryTracker>> GetInventoryTracker()
+		public async Task<IActionResult> GetInventoryTracker()
 		{
-			List<Models.InventoryTracker> inventoryTracker = await _context.InventoryTracker.ToListAsync();
-			return inventoryTracker;
-		}
+			var inventoryTracker = await _context.InventoryTracker
+				.Include(x => x.Product)
+				.Include(x => x.Storage).ToListAsync();
+			//An attempt to simplify the inventoryTracker
+            var simplifiedResult = inventoryTracker.Select(it => new
+            {
+                it.Id,
+                Product = new
+                {
+                    it.Product.Id,
+                    it.Product.Name,
+					it.Product.ArticleNumber,
+					it.Product.CurrentStock,
+					it.Product.TotalStock,
+					it.Product.Description,
+					it.Product.Price,
+					it.Product.Created,
+                    it.Storage.Updated
+
+                    // Add other necessary product fields
+                },
+                Storage = new
+                {
+                    it.Storage.Id,
+                    it.Storage.Name,
+					it.Storage.Created,
+					it.Storage.CurrentStock,
+					it.Storage.MaxCapacity,
+					it.Storage.Updated
+                    // Add other necessary storage fields
+                },
+                it.Quantity
+            });
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true // For better readability
+            };
+
+            // Serialize with options
+            var json = JsonSerializer.Serialize(inventoryTracker, options);
+            Console.WriteLine(json);
+            return Ok(simplifiedResult);
+        }
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteInventoryTracker(int id)

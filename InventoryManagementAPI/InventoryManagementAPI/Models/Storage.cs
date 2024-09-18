@@ -22,6 +22,14 @@ namespace InventoryManagementAPI.Models
 		[JsonPropertyName("updated")]
 		public DateTime? Updated { get; set; }
 
+		[JsonPropertyName("inventoryTrackers")]
+		public virtual ICollection<InventoryTracker> InventoryTrackers { get; set; } = new List<InventoryTracker>();
+
+		[JsonPropertyName("statisticDestinationStorages")]
+		public virtual ICollection<Statistic> StatisticDestinationStorages { get; set; } = new List<Statistic>();
+
+		[JsonPropertyName("statisticInitialStorages")]
+		public virtual ICollection<Statistic> StatisticInitialStorages { get; set; } = new List<Statistic>();
 		//public virtual ICollection<Statistic> Statistics { get; set; } = new List<Statistic>();
 	}
 }

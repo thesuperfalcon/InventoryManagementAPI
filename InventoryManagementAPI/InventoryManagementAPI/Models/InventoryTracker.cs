@@ -16,10 +16,10 @@ namespace InventoryManagementAPI.Models
 		[JsonPropertyName("quantity")]
 		public int? Quantity { get; set; }
 
-		//[JsonPropertyName("product")]
-		//public virtual Product? Product { get; set; }
+		[JsonPropertyName("product")]
+		public virtual Product? Product { get; set; }
 
-		//[JsonPropertyName("storage")]
-		//public virtual Storage? Storage { get; set; }
+		[JsonPropertyName("storage")]
+		public virtual Storage? Storage { get; set; }
 	}
 }
