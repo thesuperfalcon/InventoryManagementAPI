@@ -57,7 +57,12 @@ namespace InventoryManagementAPI.Controllers
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
         }
-
+        [HttpGet("{id}")]
+        public async Task<Models.User> GetUserById(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            return user;
+        }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {

@@ -42,6 +42,11 @@ namespace InventoryManagementAPI.Controllers
             List<Models.Storage> storages = await _context.Storages.ToListAsync();
             return storages;
         }
+        [HttpGet("{id}")]
+        public async Task<Models.Storage> GetStorageById(int id)
+        {
+            return await _context.Storages.FindAsync(id);
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStorages(int id)

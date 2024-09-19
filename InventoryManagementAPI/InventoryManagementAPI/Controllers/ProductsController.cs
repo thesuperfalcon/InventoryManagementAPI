@@ -45,6 +45,14 @@ namespace InventoryManagementAPI.Controllers
            
             return products;
         }
+        [HttpGet("{id}")]
+        public async Task<Models.Product> GetProductById(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+
+            return product;
+        }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProducts(int id)

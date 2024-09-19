@@ -36,51 +36,78 @@ namespace InventoryManagementAPI.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetInventoryTracker()
+        [HttpGet]
+        public async Task<IActionResult> GetInventoryTracker()
+        {
+            var inventoryTracker = await _context.InventoryTracker
+                .Include(x => x.Product)
+                .Include(x => x.Storage)
+                .Select(it => new
+                {
+                    it.Id,
+                    Product = new
+                    {
+                        it.Product.Id,
+                        it.Product.Name,
+                        it.Product.ArticleNumber,
+                        it.Product.CurrentStock,
+                        it.Product.TotalStock,
+                        it.Product.Description,
+                        it.Product.Price,
+                        it.Product.Created,
+                        it.Storage.Updated
+                    },
+                    Storage = new
+                    {
+                        it.Storage.Id,
+                        it.Storage.Name,
+                        it.Storage.Created,
+                        it.Storage.CurrentStock,
+                        it.Storage.MaxCapacity,
+                        it.Storage.Updated
+                    },
+                    it.Quantity
+                })
+                .ToListAsync();
+
+            return Ok(inventoryTracker);
+        }
+
+        [HttpGet("{id}")]
+		public async Task<IActionResult>GetInventoryTrackerById(int id)
 		{
-			var inventoryTracker = await _context.InventoryTracker
-				.Include(x => x.Product)
-				.Include(x => x.Storage).ToListAsync();
-			//An attempt to simplify the inventoryTracker
-            var simplifiedResult = inventoryTracker.Select(it => new
-            {
-                it.Id,
-                Product = new
-                {
-                    it.Product.Id,
-                    it.Product.Name,
-					it.Product.ArticleNumber,
-					it.Product.CurrentStock,
-					it.Product.TotalStock,
-					it.Product.Description,
-					it.Product.Price,
-					it.Product.Created,
-                    it.Storage.Updated
-
-                    // Add other necessary product fields
-                },
-                Storage = new
-                {
-                    it.Storage.Id,
-                    it.Storage.Name,
-					it.Storage.Created,
-					it.Storage.CurrentStock,
-					it.Storage.MaxCapacity,
-					it.Storage.Updated
-                    // Add other necessary storage fields
-                },
-                it.Quantity
-            });
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true // For better readability
-            };
-
-            // Serialize with options
-            var json = JsonSerializer.Serialize(inventoryTracker, options);
-            Console.WriteLine(json);
-            return Ok(simplifiedResult);
+            var inventoryTracker = await _context.InventoryTracker
+               .Include(x => x.Product)
+               .Include(x => x.Storage)
+               .Where(x => x.Id == id)
+               .Select(it => new
+               {
+                   it.Id,
+                   Product = new
+                   {
+                       it.Product.Id,
+                       it.Product.Name,
+                       it.Product.ArticleNumber,
+                       it.Product.CurrentStock,
+                       it.Product.TotalStock,
+                       it.Product.Description,
+                       it.Product.Price,
+                       it.Product.Created,
+                       it.Storage.Updated
+                   },
+                   Storage = new
+                   {
+                       it.Storage.Id,
+                       it.Storage.Name,
+                       it.Storage.Created,
+                       it.Storage.CurrentStock,
+                       it.Storage.MaxCapacity,
+                       it.Storage.Updated
+                   },
+                   it.Quantity
+               })
+               .ToListAsync();
+            return Ok(inventoryTracker);
         }
 
 		[HttpDelete("{id}")]

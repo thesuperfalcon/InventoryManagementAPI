@@ -1,4 +1,5 @@
-﻿using InventoryManagementAPI.Data;
+﻿using InventoryManagementAPI.DAL;
+using InventoryManagementAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,11 +34,19 @@ namespace InventoryManagementAPI.Controllers
 		[HttpGet]
 		public async Task<List<Models.Statistic>> GetStatistics()
 		{
-			List<Models.Statistic> statistics = await _context.Statistics.ToListAsync();
-			return statistics;
-		}
+			List<Models.Statistic> statistics = await StatisticData.GetStatisticsAsync(null);
 
-		[HttpDelete("{id}")]
+            return statistics;
+		}
+        [HttpGet("{id}")]
+        public async Task<List<Models.Statistic>> GetStatisticsById(int id)
+        {
+            var statistic = await StatisticData.GetStatisticsAsync(id);
+
+            return statistic;
+        }
+
+        [HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteStatistic(int id)
 		{
 			var statistic = await _context.Statistics.FindAsync(id);
