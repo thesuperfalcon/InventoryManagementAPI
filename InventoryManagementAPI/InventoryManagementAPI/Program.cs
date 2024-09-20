@@ -23,8 +23,9 @@ namespace InventoryManagementAPI
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                //options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Do not use reference handling
+                /*options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;*/ // Do not use reference handling
                 options.JsonSerializerOptions.WriteIndented = true; // Optional: for readability
+                //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
             //builder.Services.AddControllers()

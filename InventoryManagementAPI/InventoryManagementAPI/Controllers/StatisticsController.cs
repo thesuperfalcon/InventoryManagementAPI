@@ -32,19 +32,19 @@ namespace InventoryManagementAPI.Controllers
 		}
 
 		[HttpGet]
-		public async Task<List<Models.Statistic>> GetStatistics()
+		public async Task<IActionResult> GetStatistics()
 		{
-			List<Models.Statistic> statistics = await StatisticData.GetStatisticsAsync(null);
+			var statistics = await StatisticData.GetStatisticsAsync();
 
-            return statistics;
-		}
-        [HttpGet("{id}")]
-        public async Task<List<Models.Statistic>> GetStatisticsById(int id)
-        {
-            var statistic = await StatisticData.GetStatisticsAsync(id);
-
-            return statistic;
+			return Ok(statistics);
         }
+        //[HttpGet("{id}")]
+        //public async Task<List<Models.Statistic>> GetStatisticsById(int id)
+        //{
+        //    //var statistic = await StatisticData.GetStatisticsAsync(id);
+
+        //    //return statistic;
+        //}
 
         [HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteStatistic(int id)
