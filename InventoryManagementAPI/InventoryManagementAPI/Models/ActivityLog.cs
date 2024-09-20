@@ -10,8 +10,8 @@ namespace InventoryManagementAPI.Models
 
 		//Krockar med Primary Keys, kolla om vi behöver lägga till productId och storageId i databasen för ActivityLog
 
-		//[JsonPropertyName("userId")]
-		//public string? UserId { get; set; }
+		[JsonPropertyName("userId")]
+		public string? UserId { get; set; }
 
 		[JsonPropertyName("action")]
 		public ActionType? Action { get; set; }
@@ -27,13 +27,6 @@ namespace InventoryManagementAPI.Models
 
 		[JsonPropertyName("notes")]
 		public string? Notes { get; set; }
-
-		//[JsonPropertyName("productId")]
-		//public int ProductId { get; set; }
-
-		//[JsonPropertyName("storageId")]
-		//public int StorageId { get; set; }
-
 
 		[ForeignKey(nameof(TypeId))]
 		public virtual Product? Product { get; set; }
