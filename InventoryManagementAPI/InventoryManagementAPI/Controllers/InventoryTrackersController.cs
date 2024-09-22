@@ -22,12 +22,15 @@ namespace InventoryManagementAPI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] Models.InventoryTracker inventoryTracker)
 		{
+			
 			_context.InventoryTracker.Add(inventoryTracker);
+			Console.WriteLine(_context.Entry(inventoryTracker).State); // Should be "Added" before SaveChangesAsync
 			await _context.SaveChangesAsync();
+			Console.WriteLine(_context.Entry(inventoryTracker).State); // S
 			return Ok();
 		}
 
-		[HttpPut]
+		[HttpPut("{id}")]
 		public async Task<IActionResult> Put([FromBody] Models.InventoryTracker inventoryTracker)
 		{
 			_context.Update(inventoryTracker);
@@ -35,7 +38,7 @@ namespace InventoryManagementAPI.Controllers
 			return Ok();
 		}
 
-		[HttpGet]
+
         [HttpGet]
         public async Task<IActionResult> GetInventoryTracker()
         {

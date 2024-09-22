@@ -16,6 +16,8 @@ namespace InventoryManagementAPI.Models
 		[JsonPropertyName("quantity")]
 		public int? Quantity { get; set; }
 
+		[JsonPropertyName("modified")]
+		public DateTime? Modified { get; set; }
 		[JsonPropertyName("product")]
 		public virtual Product? Product { get; set; }
 
