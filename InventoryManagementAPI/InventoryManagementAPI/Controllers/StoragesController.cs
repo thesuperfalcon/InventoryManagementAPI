@@ -52,12 +52,20 @@ namespace InventoryManagementAPI.Controllers
         public async Task<IActionResult> DeleteStorages(int id)
         {
             var storage = await _context.Storages.FindAsync(id);
+
             if (storage == null)
             {
                 return NotFound();
             }
 
-            _context.Storages.Remove(storage);
+            if (!(bool)storage.IsDeleted)
+            {
+                storage.IsDeleted = true;
+            }
+            else
+            {
+                _context.Storages.Remove(storage);
+            }
             await _context.SaveChangesAsync();
             return Ok();
         }

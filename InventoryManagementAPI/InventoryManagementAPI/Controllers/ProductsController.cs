@@ -57,13 +57,23 @@ namespace InventoryManagementAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProducts(int id)
         {
-            var products = await _context.Products.FindAsync(id);
-            if (products == null)
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(products);
+            if (!(bool)product.IsDeleted)
+            {
+                product.IsDeleted = true;
+            }
+            else
+            {
+                var statistics = await _context.Statistics.Where(x => x.ProductId == product.Id).ToListAsync();
+                _context.Statistics.RemoveRange(statistics);
+                _context.Products.Remove(product);
+            }
             await _context.SaveChangesAsync();
             return Ok();
         }

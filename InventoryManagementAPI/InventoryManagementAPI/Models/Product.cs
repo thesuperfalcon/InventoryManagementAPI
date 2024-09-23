@@ -32,7 +32,10 @@ namespace InventoryManagementAPI.Models
 
 		[JsonPropertyName("updated")]
 		public DateTime? Updated { get; set; }
-		public virtual ICollection<InventoryTracker> InventoryTrackers { get; set; } = new List<InventoryTracker>();
+        [JsonPropertyName("isDeleted")]
+        public bool? IsDeleted { get; set; } = false;
+        public virtual ICollection<InventoryTracker> InventoryTrackers { get; set; } = new List<InventoryTracker>();
 		public virtual ICollection<ActivityLog> ActivityLog { get; set; } = new List<ActivityLog>();
+		public virtual ICollection<Statistic> Statistics { get; set; } = new List<Statistic>();
 	}
 }

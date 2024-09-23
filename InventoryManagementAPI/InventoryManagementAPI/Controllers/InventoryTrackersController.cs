@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using InventoryManagementAPI.DTO;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -19,18 +20,47 @@ namespace InventoryManagementAPI.Controllers
 			_context = context;
 		}
 
-		[HttpPost]
-		public async Task<IActionResult> Post([FromBody] Models.InventoryTracker inventoryTracker)
-		{
-			
-			_context.InventoryTracker.Add(inventoryTracker);
-			Console.WriteLine(_context.Entry(inventoryTracker).State); // Should be "Added" before SaveChangesAsync
-			await _context.SaveChangesAsync();
-			Console.WriteLine(_context.Entry(inventoryTracker).State); // S
-			return Ok();
-		}
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] InventoryTrackerDto inventoryTrackerDto)
+        {
+            if (inventoryTrackerDto == null)
+            {
+                return BadRequest("Tracker data is null.");
+            }
 
-		[HttpPut("{id}")]
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var inventoryTracker = new Models.InventoryTracker
+                {
+                    StorageId = inventoryTrackerDto.StorageId,
+                    ProductId = inventoryTrackerDto.ProductId,
+                    Quantity = inventoryTrackerDto.Quantity
+                };
+
+                _context.InventoryTracker.Add(inventoryTracker);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetInventoryTrackerById), new { id = inventoryTracker.Id }, inventoryTracker);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var innerExceptionMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                return StatusCode(500, $"Internal server error: {innerExceptionMessage}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
+        [HttpPut("{id}")]
 		public async Task<IActionResult> Put([FromBody] Models.InventoryTracker inventoryTracker)
 		{
 			_context.Update(inventoryTracker);
@@ -48,6 +78,7 @@ namespace InventoryManagementAPI.Controllers
                 .Select(it => new
                 {
                     it.Id,
+                    it.ProductId,
                     Product = new
                     {
                         it.Product.Id,
@@ -58,8 +89,10 @@ namespace InventoryManagementAPI.Controllers
                         it.Product.Description,
                         it.Product.Price,
                         it.Product.Created,
-                        it.Storage.Updated
+                        it.Product.Updated,
+                        it.Product.IsDeleted
                     },
+                    it.StorageId,
                     Storage = new
                     {
                         it.Storage.Id,
@@ -67,7 +100,8 @@ namespace InventoryManagementAPI.Controllers
                         it.Storage.Created,
                         it.Storage.CurrentStock,
                         it.Storage.MaxCapacity,
-                        it.Storage.Updated
+                        it.Storage.Updated,
+                        it.Storage.IsDeleted
                     },
                     it.Quantity
                 })
