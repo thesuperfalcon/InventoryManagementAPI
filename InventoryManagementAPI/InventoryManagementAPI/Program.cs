@@ -17,11 +17,7 @@ namespace InventoryManagementAPI
 
             var connectionString = builder.Configuration.GetConnectionString("InventoryManagementAPIContext");
             Console.WriteLine("Connectionstring: " + connectionString);
-<<<<<<< Updated upstream
-            builder.Services.AddTransient<Data.ProductManager>();
-=======
             builder.Services.AddDbContext<Data.InventoryManagementAPIContext>(options => options.UseSqlServer(connectionString));
->>>>>>> Stashed changes
             builder.Services.AddControllers();
 
             builder.Services.AddControllers().AddJsonOptions(options =>
@@ -65,6 +61,7 @@ namespace InventoryManagementAPI
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
+                await context.CreateDefaultSlot();
                 await context.SeedTestDataAsync();
             }
 

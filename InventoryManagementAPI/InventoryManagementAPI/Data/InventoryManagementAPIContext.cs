@@ -7,6 +7,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection.Emit;
+using Microsoft.Build.Framework;
 
 namespace InventoryManagementAPI.Data
 {
@@ -23,9 +24,30 @@ namespace InventoryManagementAPI.Data
         public DbSet<InventoryManagementAPI.Models.ActivityLog> ActivityLog { get; set; }
         public DbSet<InventoryManagementAPI.Models.InventoryTracker> InventoryTracker { get; set; }
 
+        public async Task CreateDefaultSlot()
+        {
+            if(await Storages.AnyAsync())
+            {
+                return;
+            }
+
+            var defaultSlot = new Storage
+            {
+                Name = "Default",
+                CurrentStock = 0,
+                MaxCapacity = null,
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            Storages.Add(defaultSlot);
+            await SaveChangesAsync();
+        }
+
         public async Task SeedTestDataAsync()
         {
-            if (await Products.AnyAsync() || await Storages.AnyAsync())
+            if (await Products.AnyAsync() && await Storages.AnyAsync())
             {
                 return; 
             }

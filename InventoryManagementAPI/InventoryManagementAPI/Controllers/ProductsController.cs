@@ -30,6 +30,7 @@ namespace InventoryManagementAPI.Controllers
         {
             _context.Products.Add(products);
             await _context.SaveChangesAsync();
+            await _productManager.SendProductToDefaultStorageAsync(products.Id, products);
             return Ok();
         }
 

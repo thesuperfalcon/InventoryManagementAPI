@@ -1,5 +1,7 @@
 ﻿using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace InventoryManagementAPI.DAL
 {
@@ -27,6 +29,31 @@ namespace InventoryManagementAPI.DAL
                 existingProduct.IsDeleted = product.IsDeleted;
 
                 _context.Products.Update(existingProduct);
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task SendProductToDefaultStorageAsync(int id, Product product)
+        {
+            var existingProduct = await _context.Products.FindAsync(id);
+            var defaultStorage = await _context.Storages.FirstOrDefaultAsync(x => x.Name == "Default");
+
+
+            if(existingProduct != null)
+            {
+                var productTracker = new InventoryTracker
+                {
+                    StorageId = defaultStorage.Id,
+                    ProductId = existingProduct.Id,
+                    Quantity = existingProduct.TotalStock,
+                    Modified = DateTime.Now,
+                    Product = existingProduct,
+                    Storage = defaultStorage,
+                };
+                defaultStorage.CurrentStock = existingProduct.TotalStock;
+                _context.InventoryTracker.Update(productTracker);
+                _context.Products.Update(existingProduct);
+                _context.Storages.Update(defaultStorage);
+
                 await _context.SaveChangesAsync();
             }
         }
