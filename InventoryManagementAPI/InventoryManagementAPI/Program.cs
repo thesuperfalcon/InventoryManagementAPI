@@ -8,31 +8,22 @@ namespace InventoryManagementAPI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args) // Gör metoden asynkron
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<InventoryManagementAPIContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("InventoryManagementAPIContext") ?? throw new InvalidOperationException("Connection string 'InventoryManagementAPIContext' not found.")));
 
-            // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("InventoryManagementAPIContext");
             Console.WriteLine("Connectionstring: " + connectionString);
-            builder.Services.AddDbContext<Data.InventoryManagementAPIContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddTransient<Data.ProductManager>();
             builder.Services.AddControllers();
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                /*options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;*/ // Do not use reference handling
-                options.JsonSerializerOptions.WriteIndented = true; // Optional: for readability
-                //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.WriteIndented = true; // För läsbarhet
             });
 
-            //builder.Services.AddControllers()
-            //.AddJsonOptions(options =>
-            //{
-            //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            //});            
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -40,10 +31,6 @@ namespace InventoryManagementAPI
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
 
-            //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
-
-            //builder.Services.AddDefaultTokenProviders();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -57,11 +44,15 @@ namespace InventoryManagementAPI
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
+
+            // Anropa SeedTestDataAsync för att skapa testdata
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
+                await context.SeedTestDataAsync();
+            }
 
             app.Run();
         }
