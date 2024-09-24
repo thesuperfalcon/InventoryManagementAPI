@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using InventoryManagementAPI.DTO;
+using InventoryManagementAPI.DAL;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -14,10 +15,12 @@ namespace InventoryManagementAPI.Controllers
 	public class InventoryTrackersController : Controller
 	{
 		private readonly InventoryManagementAPIContext _context;
+        private readonly InventoryTrackerManager _trackerManager;
 
-		public InventoryTrackersController(InventoryManagementAPIContext context)
+		public InventoryTrackersController(InventoryManagementAPIContext context, InventoryTrackerManager trackerManager)
 		{
 			_context = context;
+            _trackerManager = trackerManager;
 		}
 
         [HttpPost]
@@ -58,15 +61,13 @@ namespace InventoryManagementAPI.Controllers
             }
         }
 
-
-
         [HttpPut("{id}")]
-		public async Task<IActionResult> Put([FromBody] Models.InventoryTracker inventoryTracker)
-		{
-			_context.Update(inventoryTracker);
-			await _context.SaveChangesAsync();
-			return Ok();
-		}
+        public async Task<IActionResult> Put(int id, [FromBody] Models.InventoryTracker inventoryTracker)
+        {
+
+            await _trackerManager.UpdateInventoryTrackerAsync(id, inventoryTracker);
+            return Ok();
+        }
 
 
         [HttpGet]

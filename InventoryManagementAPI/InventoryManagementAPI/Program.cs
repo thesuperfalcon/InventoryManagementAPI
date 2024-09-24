@@ -1,3 +1,4 @@
+using InventoryManagementAPI.DAL;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
@@ -39,6 +40,10 @@ namespace InventoryManagementAPI
                 options.Password.RequiredLength = 6;
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
+
+
+            builder.Services.AddScoped<StorageManager>();
+            builder.Services.AddScoped<InventoryTrackerManager>();
 
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 
