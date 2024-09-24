@@ -8,8 +8,6 @@ namespace InventoryManagementAPI.DAL
     {
         private readonly InventoryManagementAPIContext _context;
 
-        public static List<Storage> Storages { get; set; }
-
         public StorageManager(InventoryManagementAPIContext context)
         {
             _context = context;

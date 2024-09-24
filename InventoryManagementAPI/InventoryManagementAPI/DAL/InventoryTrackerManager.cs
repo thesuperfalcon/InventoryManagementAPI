@@ -9,8 +9,6 @@ namespace InventoryManagementAPI.DAL
 
         private readonly InventoryManagementAPIContext _context;
 
-        public static List<InventoryTracker> Trackers { get; set; }
-
         public InventoryTrackerManager(InventoryManagementAPIContext context)
         {
             _context = context;

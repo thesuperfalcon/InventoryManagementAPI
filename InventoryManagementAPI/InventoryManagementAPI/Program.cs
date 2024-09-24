@@ -17,7 +17,11 @@ namespace InventoryManagementAPI
 
             var connectionString = builder.Configuration.GetConnectionString("InventoryManagementAPIContext");
             Console.WriteLine("Connectionstring: " + connectionString);
+<<<<<<< Updated upstream
             builder.Services.AddTransient<Data.ProductManager>();
+=======
+            builder.Services.AddDbContext<Data.InventoryManagementAPIContext>(options => options.UseSqlServer(connectionString));
+>>>>>>> Stashed changes
             builder.Services.AddControllers();
 
             builder.Services.AddControllers().AddJsonOptions(options =>
@@ -35,6 +39,7 @@ namespace InventoryManagementAPI
 
             builder.Services.AddScoped<StorageManager>();
             builder.Services.AddScoped<InventoryTrackerManager>();
+            builder.Services.AddScoped<ProductManager>();
 
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 

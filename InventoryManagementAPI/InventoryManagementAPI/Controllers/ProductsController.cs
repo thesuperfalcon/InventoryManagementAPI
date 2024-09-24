@@ -9,6 +9,7 @@ using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using InventoryManagementAPI.DAL;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -17,10 +18,12 @@ namespace InventoryManagementAPI.Controllers
     public class ProductsController : Controller
     {
         private readonly InventoryManagementAPIContext _context;
+        private readonly ProductManager _productManager;
 
-        public ProductsController(InventoryManagementAPIContext context)
+        public ProductsController(InventoryManagementAPIContext context, ProductManager productManager)
         {
             _context = context;
+            _productManager = productManager;
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.Product products)
@@ -31,10 +34,9 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromBody] Models.Product products)
+        public async Task<IActionResult> Put(int id, [FromBody] Models.Product products)
         {
-            _context.Update(products);
-            await _context.SaveChangesAsync();
+            await _productManager.UpdateProductAsync(id, products);
             return Ok();
         }
 
