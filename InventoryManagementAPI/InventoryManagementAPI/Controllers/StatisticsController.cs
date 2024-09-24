@@ -1,5 +1,6 @@
 ﻿using InventoryManagementAPI.DAL;
 using InventoryManagementAPI.Data;
+using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +17,19 @@ namespace InventoryManagementAPI.Controllers
 			_context = context;
 		}
 		[HttpPost]
-		public async Task<IActionResult> Post([FromBody] Models.Statistic statistic)
+		public async Task<IActionResult> Post([FromBody] DTO.StatisticDto statistic)
 		{
-			_context.Statistics.Add(statistic);
+			var statisticResponse = new Statistic
+			{
+				Id = statistic.Id,
+				UserId = statistic.UserId,
+				InitialStorageId = statistic.InitialStorageId,
+				DestinationStorageId = statistic.DestinationStorageId,
+				ProductId = statistic.ProductId,
+				ProductQuantity = statistic.ProductQuantity,
+				OrderTime = statistic.OrderTime
+			};
+			_context.Statistics.Add(statisticResponse);
 			await _context.SaveChangesAsync();
 			return Ok();
 		}

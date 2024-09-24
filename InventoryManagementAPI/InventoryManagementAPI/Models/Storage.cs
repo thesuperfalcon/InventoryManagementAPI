@@ -24,7 +24,7 @@ namespace InventoryManagementAPI.Models
         [JsonPropertyName("isDeleted")]
         public bool? IsDeleted { get; set; } = false;
 
-        [JsonPropertyName("activityLogs")]
+        [JsonPropertyName("activityLog")]
         public virtual ICollection<ActivityLog> ActivityLog { get; set; } = new List<ActivityLog>();
 
         [JsonPropertyName("inventoryTrackers")]
