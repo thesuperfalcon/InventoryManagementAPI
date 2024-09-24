@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
+using InventoryManagementAPI.DAL;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -15,10 +16,12 @@ namespace InventoryManagementAPI.Controllers
     public class StoragesController : Controller
     {
         private readonly InventoryManagementAPIContext _context;
+        private readonly StorageManager _storageManager;
 
-        public StoragesController(InventoryManagementAPIContext context)
+        public StoragesController(InventoryManagementAPIContext context, StorageManager storageManager)
         {
             _context = context;
+            _storageManager = storageManager;
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.Storage storages)
@@ -28,18 +31,18 @@ namespace InventoryManagementAPI.Controllers
             return Ok();
         }
 
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> Put([FromBody] Models.Storage storages)
+        //{
+        //    _context.Update(storages);
+        //    await _context.SaveChangesAsync();
+        //    return Ok();
+        //}
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromBody] Models.Storage storages)
+        public async Task<IActionResult> Put(int id, [FromBody] Models.Storage storages)
         {
-            if (storages == null)
-            {
-                return BadRequest("Storage is null");
-            }
-
-            Console.WriteLine($"Updating Storage ID: {storages.Id}, CurrentStock: {storages.CurrentStock}");
-
-            _context.Update(storages);
-            await _context.SaveChangesAsync();
+            await _storageManager.UpdateStoragesAsync(id, storages);
             return Ok();
         }
 

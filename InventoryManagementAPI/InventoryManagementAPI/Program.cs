@@ -1,3 +1,4 @@
+using InventoryManagementAPI.DAL;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +9,7 @@ namespace InventoryManagementAPI
 {
     public class Program
     {
-        public static async Task Main(string[] args) // Gör metoden asynkron
+        public static async Task Main(string[] args) // Gï¿½r metoden asynkron
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<InventoryManagementAPIContext>(options =>
@@ -21,7 +22,7 @@ namespace InventoryManagementAPI
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.WriteIndented = true; // För läsbarhet
+                options.JsonSerializerOptions.WriteIndented = true; // Fï¿½r lï¿½sbarhet
             });
 
             builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -31,6 +32,14 @@ namespace InventoryManagementAPI
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
 
+
+            builder.Services.AddScoped<StorageManager>();
+            builder.Services.AddScoped<InventoryTrackerManager>();
+
+            //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
+
+            //builder.Services.AddDefaultTokenProviders();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -47,7 +56,7 @@ namespace InventoryManagementAPI
             app.UseAuthorization();
             app.MapControllers();
 
-            // Anropa SeedTestDataAsync för att skapa testdata
+            // Anropa SeedTestDataAsync fï¿½r att skapa testdata
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
