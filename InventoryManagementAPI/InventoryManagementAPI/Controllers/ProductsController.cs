@@ -10,6 +10,7 @@ using InventoryManagementAPI.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using InventoryManagementAPI.DAL;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -44,16 +45,38 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet]
         public async Task<List<Models.Product>> GetProducts()
         {
-            List<Models.Product> products = await _context.Products.ToListAsync();
-           
-            return products;
+            return await _context.Products.ToListAsync();
         }
-        [HttpGet("{id}")]
-        public async Task<Models.Product> GetProductById(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
 
-            return product;
+        [HttpGet("{id}")]
+        public async Task <Models.Product> GetProductById(int id)
+        {
+            return await _context.Products.FindAsync(id);
+        }
+
+        [HttpGet("ExistingProducts")]
+        public async Task<List<Models.Product>> GetExistingProducts()
+        {
+            return await _context.Products.Where(x => x.IsDeleted == false).ToListAsync();
+        }
+
+        [HttpGet("ExistingProducts/{id}")]
+        public async Task<Models.Product> GetExistingProductById(int id)
+        {
+            return await _context.Products.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        [HttpGet("DeletedProducts")]
+        public async Task<List<Models.Product>> GetDeletedProducts()
+        {
+            return await _context.Products.Where(x => x.IsDeleted == true).ToListAsync();
+
+        }
+
+        [HttpGet("DeletedProducts/{id}")]
+        public async Task<Models.Product> GetDeletedProductById(int id)
+        {
+            return await _context.Products.Where(x => x.IsDeleted == true).FirstOrDefaultAsync(x => x.Id == id);
         }
 
 

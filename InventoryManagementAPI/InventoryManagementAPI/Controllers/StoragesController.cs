@@ -30,15 +30,7 @@ namespace InventoryManagementAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok();
         }
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Put([FromBody] Models.Storage storages)
-        //{
-        //    _context.Update(storages);
-        //    await _context.SaveChangesAsync();
-        //    return Ok();
-        //}
-
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Models.Storage storages)
         {
@@ -46,17 +38,42 @@ namespace InventoryManagementAPI.Controllers
             return Ok();
         }
 
-
         [HttpGet]
         public async Task<List<Models.Storage>> GetStorages()
         {
-            List<Models.Storage> storages = await _context.Storages.ToListAsync();
+            var storages = await _context.Storages.ToListAsync();
             return storages;
         }
+
         [HttpGet("{id}")]
         public async Task<Models.Storage> GetStorageById(int id)
         {
             return await _context.Storages.FindAsync(id);
+        }
+
+        [HttpGet("ExistingStorages")]
+        public async Task<List<Models.Storage>> GetExistingStorages()
+        {
+            var existingStorages = await _context.Storages.Where(x => x.IsDeleted == false).ToListAsync();
+            return existingStorages;        
+        }
+
+        [HttpGet("ExistingStorages/{id}")]
+        public async Task<Models.Storage> GetExistingStorageById(int id)
+        {
+            return await _context.Storages.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        [HttpGet("DeletedStorages")]
+        public async Task<List<Models.Storage>> GetDeletedStorages()
+        {
+            return await _context.Storages.Where(x => x.IsDeleted == true).ToListAsync();
+        }
+
+        [HttpGet("DeletedStorages/{id}")]
+        public async Task<Models.Storage> GetDeletedStorageById(int id)
+        {
+            return await _context.Storages.Where(x => x.IsDeleted == true).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         [HttpDelete("{id}")]

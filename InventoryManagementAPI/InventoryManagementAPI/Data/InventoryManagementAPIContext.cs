@@ -34,7 +34,7 @@ namespace InventoryManagementAPI.Data
             var defaultSlot = new Storage
             {
                 Name = "Default",
-                CurrentStock = 0,
+                CurrentStock = 50,
                 MaxCapacity = null,
                 Created = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
@@ -57,7 +57,7 @@ namespace InventoryManagementAPI.Data
                 Name = "Testprodukt",
                 ArticleNumber = "TP001",
                 CurrentStock = 0,
-                TotalStock = 100,
+                TotalStock = 50,
                 Description = "Detta är en testprodukt.",
                 Price = 99.99m,
                 Created = DateTime.UtcNow,
@@ -71,7 +71,7 @@ namespace InventoryManagementAPI.Data
             var storage1 = new Storage
             {
                 Name = "Lager 1",
-                CurrentStock = 50,
+                CurrentStock = 0,
                 MaxCapacity = 200,
                 Created = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
@@ -81,7 +81,7 @@ namespace InventoryManagementAPI.Data
             var storage2 = new Storage
             {
                 Name = "Lager 2",
-                CurrentStock = 50,
+                CurrentStock = 0,
                 MaxCapacity = 200,
                 Created = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
@@ -91,21 +91,18 @@ namespace InventoryManagementAPI.Data
             Storages.AddRange(storage1, storage2);
             await SaveChangesAsync(); 
 
+            var storageDefault = Storages.Where(x => x.Name == "Default").FirstOrDefault();
+
             var inventoryTracker1 = new InventoryTracker
             {
-                StorageId = storage1.Id,
+                StorageId = storageDefault.Id,
                 ProductId = product.Id,
                 Quantity = 50
             };
 
-            var inventoryTracker2 = new InventoryTracker
-            {
-                StorageId = storage2.Id,
-                ProductId = product.Id,
-                Quantity = 50
-            };
+           
 
-            InventoryTracker.AddRange(inventoryTracker1, inventoryTracker2);
+            InventoryTracker.AddRange(inventoryTracker1);
             await SaveChangesAsync(); 
         }
 

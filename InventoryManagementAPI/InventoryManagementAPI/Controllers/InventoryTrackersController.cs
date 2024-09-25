@@ -76,36 +76,6 @@ namespace InventoryManagementAPI.Controllers
             var inventoryTracker = await _context.InventoryTracker
                 .Include(x => x.Product)
                 .Include(x => x.Storage)
-                .Select(it => new
-                {
-                    it.Id,
-                    it.ProductId,
-                    Product = new
-                    {
-                        it.Product.Id,
-                        it.Product.Name,
-                        it.Product.ArticleNumber,
-                        it.Product.CurrentStock,
-                        it.Product.TotalStock,
-                        it.Product.Description,
-                        it.Product.Price,
-                        it.Product.Created,
-                        it.Product.Updated,
-                        it.Product.IsDeleted
-                    },
-                    it.StorageId,
-                    Storage = new
-                    {
-                        it.Storage.Id,
-                        it.Storage.Name,
-                        it.Storage.Created,
-                        it.Storage.CurrentStock,
-                        it.Storage.MaxCapacity,
-                        it.Storage.Updated,
-                        it.Storage.IsDeleted
-                    },
-                    it.Quantity
-                })
                 .ToListAsync();
 
             return Ok(inventoryTracker);
@@ -118,33 +88,8 @@ namespace InventoryManagementAPI.Controllers
                .Include(x => x.Product)
                .Include(x => x.Storage)
                .Where(x => x.Id == id)
-               .Select(it => new
-               {
-                   it.Id,
-                   Product = new
-                   {
-                       it.Product.Id,
-                       it.Product.Name,
-                       it.Product.ArticleNumber,
-                       it.Product.CurrentStock,
-                       it.Product.TotalStock,
-                       it.Product.Description,
-                       it.Product.Price,
-                       it.Product.Created,
-                       it.Storage.Updated
-                   },
-                   Storage = new
-                   {
-                       it.Storage.Id,
-                       it.Storage.Name,
-                       it.Storage.Created,
-                       it.Storage.CurrentStock,
-                       it.Storage.MaxCapacity,
-                       it.Storage.Updated
-                   },
-                   it.Quantity
-               })
                .ToListAsync();
+
             return Ok(inventoryTracker);
         }
 
