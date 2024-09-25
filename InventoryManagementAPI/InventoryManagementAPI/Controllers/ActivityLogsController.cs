@@ -1,4 +1,5 @@
 ﻿using InventoryManagementAPI.Data;
+using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +17,25 @@ namespace InventoryManagementAPI.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Post([FromBody] Models.ActivityLog activityLog)
+		//public async Task<IActionResult> Post([FromBody] Models.ActivityLog activityLog)
+		//{
+		//	_context.ActivityLog.Add(activityLog);
+		//	await _context.SaveChangesAsync();
+		//	return Ok();
+		//}
+		public async Task<IActionResult> Post([FromBody] DTO.ActivityLogDTO log)
 		{
-			_context.ActivityLog.Add(activityLog);
+			var logResponse = new ActivityLog
+			{
+				Id = log.Id,
+				UserId = log.UserId,
+				Action = (ActionType?)log.Action,
+				ItemType = (ItemType?)log.ItemType,
+				TypeId = log.TypeId,
+				TimeStamp = log.TimeStamp,
+				Notes = log.Notes
+			};
+			_context.ActivityLog.Add(logResponse);
 			await _context.SaveChangesAsync();
 			return Ok();
 		}
