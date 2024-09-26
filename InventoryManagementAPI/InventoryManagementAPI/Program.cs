@@ -1,3 +1,4 @@
+using InventoryManagementAPI.DAL;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
@@ -8,37 +9,34 @@ namespace InventoryManagementAPI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args) // G�r metoden asynkron
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<InventoryManagementAPIContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("InventoryManagementAPIContext") ?? throw new InvalidOperationException("Connection string 'InventoryManagementAPIContext' not found.")));
 
-            // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("InventoryManagementAPIContext");
             Console.WriteLine("Connectionstring: " + connectionString);
             builder.Services.AddDbContext<Data.InventoryManagementAPIContext>(options => options.UseSqlServer(connectionString));
-            builder.Services.AddTransient<Data.ProductManager>();
             builder.Services.AddControllers();
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                /*options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;*/ // Do not use reference handling
-                options.JsonSerializerOptions.WriteIndented = true; // Optional: for readability
-                //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.WriteIndented = true; // F�r l�sbarhet
             });
 
-            //builder.Services.AddControllers()
-            //.AddJsonOptions(options =>
-            //{
-            //    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            //});            
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
+
+
+            builder.Services.AddScoped<StorageManager>();
+            builder.Services.AddScoped<InventoryTrackerManager>();
+            builder.Services.AddScoped<ProductManager>();
 
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 
@@ -57,11 +55,16 @@ namespace InventoryManagementAPI
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
+
+            // Anropa SeedTestDataAsync f�r att skapa testdata
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
+                await context.CreateDefaultSlot();
+                await context.SeedTestDataAsync();
+            }
 
             app.Run();
         }

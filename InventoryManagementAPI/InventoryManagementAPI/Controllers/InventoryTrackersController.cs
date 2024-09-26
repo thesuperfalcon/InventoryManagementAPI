@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using InventoryManagementAPI.DTO;
+using InventoryManagementAPI.DAL;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -14,10 +15,12 @@ namespace InventoryManagementAPI.Controllers
 	public class InventoryTrackersController : Controller
 	{
 		private readonly InventoryManagementAPIContext _context;
+        private readonly InventoryTrackerManager _trackerManager;
 
-		public InventoryTrackersController(InventoryManagementAPIContext context)
+		public InventoryTrackersController(InventoryManagementAPIContext context, InventoryTrackerManager trackerManager)
 		{
 			_context = context;
+            _trackerManager = trackerManager;
 		}
 
         [HttpPost]
@@ -58,15 +61,13 @@ namespace InventoryManagementAPI.Controllers
             }
         }
 
-
-
         [HttpPut("{id}")]
-		public async Task<IActionResult> Put([FromBody] Models.InventoryTracker inventoryTracker)
-		{
-			_context.Update(inventoryTracker);
-			await _context.SaveChangesAsync();
-			return Ok();
-		}
+        public async Task<IActionResult> Put(int id, [FromBody] Models.InventoryTracker inventoryTracker)
+        {
+
+            await _trackerManager.UpdateInventoryTrackerAsync(id, inventoryTracker);
+            return Ok();
+        }
 
 
         [HttpGet]
@@ -75,36 +76,6 @@ namespace InventoryManagementAPI.Controllers
             var inventoryTracker = await _context.InventoryTracker
                 .Include(x => x.Product)
                 .Include(x => x.Storage)
-                .Select(it => new
-                {
-                    it.Id,
-                    it.ProductId,
-                    Product = new
-                    {
-                        it.Product.Id,
-                        it.Product.Name,
-                        it.Product.ArticleNumber,
-                        it.Product.CurrentStock,
-                        it.Product.TotalStock,
-                        it.Product.Description,
-                        it.Product.Price,
-                        it.Product.Created,
-                        it.Product.Updated,
-                        it.Product.IsDeleted
-                    },
-                    it.StorageId,
-                    Storage = new
-                    {
-                        it.Storage.Id,
-                        it.Storage.Name,
-                        it.Storage.Created,
-                        it.Storage.CurrentStock,
-                        it.Storage.MaxCapacity,
-                        it.Storage.Updated,
-                        it.Storage.IsDeleted
-                    },
-                    it.Quantity
-                })
                 .ToListAsync();
 
             return Ok(inventoryTracker);
@@ -117,33 +88,8 @@ namespace InventoryManagementAPI.Controllers
                .Include(x => x.Product)
                .Include(x => x.Storage)
                .Where(x => x.Id == id)
-               .Select(it => new
-               {
-                   it.Id,
-                   Product = new
-                   {
-                       it.Product.Id,
-                       it.Product.Name,
-                       it.Product.ArticleNumber,
-                       it.Product.CurrentStock,
-                       it.Product.TotalStock,
-                       it.Product.Description,
-                       it.Product.Price,
-                       it.Product.Created,
-                       it.Storage.Updated
-                   },
-                   Storage = new
-                   {
-                       it.Storage.Id,
-                       it.Storage.Name,
-                       it.Storage.Created,
-                       it.Storage.CurrentStock,
-                       it.Storage.MaxCapacity,
-                       it.Storage.Updated
-                   },
-                   it.Quantity
-               })
                .ToListAsync();
+
             return Ok(inventoryTracker);
         }
 

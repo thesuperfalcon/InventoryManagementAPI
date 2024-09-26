@@ -9,6 +9,8 @@ using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using InventoryManagementAPI.DAL;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -17,40 +19,64 @@ namespace InventoryManagementAPI.Controllers
     public class ProductsController : Controller
     {
         private readonly InventoryManagementAPIContext _context;
+        private readonly ProductManager _productManager;
 
-        public ProductsController(InventoryManagementAPIContext context)
+        public ProductsController(InventoryManagementAPIContext context, ProductManager productManager)
         {
             _context = context;
+            _productManager = productManager;
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.Product products)
         {
             _context.Products.Add(products);
             await _context.SaveChangesAsync();
+            await _productManager.SendProductToDefaultStorageAsync(products.Id, products);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromBody] Models.Product products)
+        public async Task<IActionResult> Put(int id, [FromBody] Models.Product products)
         {
-            _context.Update(products);
-            await _context.SaveChangesAsync();
+            await _productManager.UpdateProductAsync(id, products);
             return Ok();
         }
 
         [HttpGet]
         public async Task<List<Models.Product>> GetProducts()
         {
-            List<Models.Product> products = await _context.Products.ToListAsync();
-           
-            return products;
+            return await _context.Products.ToListAsync();
         }
-        [HttpGet("{id}")]
-        public async Task<Models.Product> GetProductById(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
 
-            return product;
+        [HttpGet("{id}")]
+        public async Task <Models.Product> GetProductById(int id)
+        {
+            return await _context.Products.FindAsync(id);
+        }
+
+        [HttpGet("ExistingProducts")]
+        public async Task<List<Models.Product>> GetExistingProducts()
+        {
+            return await _context.Products.Where(x => x.IsDeleted == false).ToListAsync();
+        }
+
+        [HttpGet("ExistingProducts/{id}")]
+        public async Task<Models.Product> GetExistingProductById(int id)
+        {
+            return await _context.Products.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        [HttpGet("DeletedProducts")]
+        public async Task<List<Models.Product>> GetDeletedProducts()
+        {
+            return await _context.Products.Where(x => x.IsDeleted == true).ToListAsync();
+
+        }
+
+        [HttpGet("DeletedProducts/{id}")]
+        public async Task<Models.Product> GetDeletedProductById(int id)
+        {
+            return await _context.Products.Where(x => x.IsDeleted == true).FirstOrDefaultAsync(x => x.Id == id);
         }
 
 
