@@ -28,12 +28,18 @@ namespace InventoryManagementAPI.Models
 		[JsonPropertyName("notes")]
 		public string? Notes { get; set; }
 
-		[ForeignKey(nameof(TypeId))]
-		public virtual Product? Product { get; set; }
-		[ForeignKey(nameof(TypeId))]
-		public virtual Storage? Storage { get; set; }
+        
+        [ForeignKey(nameof(TypeId))]
+        [JsonPropertyName("product")]
+        public virtual Product? Product { get; set; }
 
-		public virtual User? User { get; set; }
+
+		[ForeignKey(nameof(TypeId))]
+        [JsonPropertyName("storage")]
+        public virtual Storage? Storage { get; set; }
+
+        [JsonPropertyName("user")]
+        public virtual User? User { get; set; }
 	}
 
 	public enum ActionType
