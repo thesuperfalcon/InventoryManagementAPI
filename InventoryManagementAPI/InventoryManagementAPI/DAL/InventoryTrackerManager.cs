@@ -58,9 +58,9 @@ namespace InventoryManagementAPI.DAL
                     break;
 
                 default:
-
                     break;
             }
+
             return selectedInventoryTrackers;
         }
     }

@@ -100,7 +100,7 @@ namespace InventoryManagementAPI.Controllers
                .Include(x => x.Product)
                .Include(x => x.Storage)
                .Where(x => x.Id == id)
-               .ToListAsync();
+               .FirstOrDefaultAsync();
 
             return Ok(inventoryTracker);
         }
