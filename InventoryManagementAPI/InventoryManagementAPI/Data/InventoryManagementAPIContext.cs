@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection.Emit;
 using Microsoft.Build.Framework;
+using Microsoft.AspNetCore.Identity;
 
 namespace InventoryManagementAPI.Data
 {
@@ -23,6 +24,7 @@ namespace InventoryManagementAPI.Data
         public DbSet<InventoryManagementAPI.Models.Statistic> Statistics { get; set; } 
         public DbSet<InventoryManagementAPI.Models.ActivityLog> ActivityLog { get; set; }
         public DbSet<InventoryManagementAPI.Models.InventoryTracker> InventoryTracker { get; set; }
+        public DbSet<InventoryManagementAPI.Models.Role> AspNetRoles {  get; set; }
 
         public async Task CreateDefaultSlot()
         {
@@ -129,7 +131,12 @@ namespace InventoryManagementAPI.Data
 
             builder.Entity<Product>()
                 .Property(p => p.Id)
-                .ValueGeneratedOnAdd();  
+                .ValueGeneratedOnAdd();
+
+
+            //builder.Entity<IdentityRole>()
+            //    .HasOne(s => s.Id)
+            //    .WithMany(s => s.);
 
         }
     }

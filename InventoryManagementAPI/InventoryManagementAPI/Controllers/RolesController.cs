@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using InventoryManagementAPI.Models;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -17,11 +18,19 @@ namespace InventoryManagementAPI.Controllers
 		}
 
 		[HttpGet]
-		public async Task<List<IdentityRole>> GetRolesAsync()
+		public async Task<List<Models.Role>> GetRolesAsync()
 		{
-			List<IdentityRole> roles = await _context.Roles.ToListAsync();
+			List<Models.Role> roles = await _context.AspNetRoles.ToListAsync();
+   //         return roles.Select(r => new Models.Role
+			//{
+			//	Id = r.Id,
+			//	RoleName = r.RoleName,
+			//	FullAccess = r.FullAccess
+
+
+			//}).ToList();
 			return roles;
 		}
 
-	}
+    }
 }
