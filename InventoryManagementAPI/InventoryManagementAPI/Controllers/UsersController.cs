@@ -1,4 +1,5 @@
 ﻿using InventoryManagementAPI.Data;
+using InventoryManagementAPI.DTO;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +57,20 @@ namespace InventoryManagementAPI.Controllers
         {
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
+   //         return users.Select(u => new Models.User
+			//{
+   //             Id = u.Id,
+   //             FirstName = u.FirstName,
+   //             LastName = u.LastName,
+   //             EmployeeNumber = u.EmployeeNumber,
+   //             RoleId = u.RoleId,
+   //             Created = u.Created,
+   //             Updated = u.Updated
+
+
+   //         }).ToList();
         }
+
         [HttpGet("{id}")]
         public async Task<Models.User> GetUserById(string id)
         {
