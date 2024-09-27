@@ -4,6 +4,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryManagementAPI
 {
@@ -33,10 +34,12 @@ namespace InventoryManagementAPI
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
 
-
+            
             builder.Services.AddScoped<StorageManager>();
             builder.Services.AddScoped<InventoryTrackerManager>();
             builder.Services.AddScoped<ProductManager>();
+            //builder.Services.AddScoped<UserManager<User>();
+            //builder.Services.AddScoped<RoleManager<Role>();
 
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 
@@ -61,12 +64,17 @@ namespace InventoryManagementAPI
             // Anropa SeedTestDataAsync f�r att skapa testdata
             using (var scope = app.Services.CreateScope())
             {
+                var services = scope.ServiceProvider;
                 var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
                 await context.CreateDefaultSlot();
                 await context.SeedTestDataAsync();
+                var roleManager = services.GetRequiredService<RoleManager<Role>>;
+                var userManager = services.GetRequiredService<UserManager<User>>;
+                //await Data.InventoryManagementAPIContext.SeedRolesAndAdminUser(roleManager, userManager);
             }
 
             app.Run();
         }
+
     }
 }

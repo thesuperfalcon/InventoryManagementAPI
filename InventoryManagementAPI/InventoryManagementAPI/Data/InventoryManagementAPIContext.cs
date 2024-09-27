@@ -9,11 +9,16 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection.Emit;
 using Microsoft.Build.Framework;
 using Microsoft.AspNetCore.Identity;
+using InventoryManagementAPI.Controllers;
+using System.Data;
+using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryManagementAPI.Data
 {
     public class InventoryManagementAPIContext : IdentityDbContext<User, Models.Role, string>
     {
+
+
         public InventoryManagementAPIContext (DbContextOptions<InventoryManagementAPIContext> options)
             : base(options)
         {
@@ -25,6 +30,7 @@ namespace InventoryManagementAPI.Data
         public DbSet<InventoryManagementAPI.Models.ActivityLog> ActivityLog { get; set; }
         public DbSet<InventoryManagementAPI.Models.InventoryTracker> InventoryTracker { get; set; }
         public DbSet<InventoryManagementAPI.Models.Role> AspNetRoles {  get; set; }
+        public DbSet<InventoryManagementAPI.Models.User> Users {  get; set; }
 
         public async Task CreateDefaultSlot()
         {
@@ -46,7 +52,7 @@ namespace InventoryManagementAPI.Data
             Storages.Add(defaultSlot);
             await SaveChangesAsync();
         }
-
+        
         public async Task SeedTestDataAsync()
         {
             if (await Products.AnyAsync() && await Storages.AnyAsync())
