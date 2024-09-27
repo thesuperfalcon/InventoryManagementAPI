@@ -3,10 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace InventoryManagementAPI.Models
 {
-	public class Role
+	public class Role : IdentityRole
 	{
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public override string Id { get; set; }
 
 		[JsonPropertyName("roleName")]
 		public string RoleName { get; set; }

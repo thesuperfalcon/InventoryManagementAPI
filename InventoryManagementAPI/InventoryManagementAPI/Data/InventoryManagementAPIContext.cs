@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace InventoryManagementAPI.Data
 {
-    public class InventoryManagementAPIContext : IdentityDbContext<User>
+    public class InventoryManagementAPIContext : IdentityDbContext<User, Models.Role, string>
     {
         public InventoryManagementAPIContext (DbContextOptions<InventoryManagementAPIContext> options)
             : base(options)
