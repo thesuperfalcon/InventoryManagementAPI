@@ -19,29 +19,29 @@ namespace InventoryManagementAPI.DAL
                 await connection.OpenAsync();
 
                 string sqlQuery = @"
-        SELECT
-            o.Id,
-            o.OrderTime,
-            o.ProductQuantity,
-            p.Name AS ProductName,
-            p.Price,
-            p.CurrentStock,
-            sInitial.Name AS InitialStorageName,
-            sInitial.MaxCapacity AS InitialMaxCapacity,
-            sDestination.Name AS DestinationStorageName,
-            sDestination.MaxCapacity AS DestinationMaxCapacity,
-            uReporter.FirstName + ' ' + uReporter.LastName AS ReporterName,
-            uReporter.EmployeeNumber AS ReporterEmployeeNumber
-        FROM
-            [Statistics] o
-                LEFT JOIN
-            Products p ON o.ProductId = p.Id
-        LEFT JOIN
-            Storages sInitial ON o.InitialStorageId = sInitial.Id
-        LEFT JOIN
-            Storages sDestination ON o.DestinationStorageId = sDestination.Id
-        LEFT JOIN
-            [AspNetUsers] uReporter ON o.UserId = uReporter.Id";
+                    SELECT
+                        o.Id,
+                        o.OrderTime,
+                        o.ProductQuantity,
+                        p.Name AS ProductName,
+                        p.Price,
+                        p.CurrentStock,
+                        sInitial.Name AS InitialStorageName,
+                        sInitial.MaxCapacity AS InitialMaxCapacity,
+                        sDestination.Name AS DestinationStorageName,
+                        sDestination.MaxCapacity AS DestinationMaxCapacity,
+                        uReporter.FirstName + ' ' + uReporter.LastName AS ReporterName,
+                        uReporter.EmployeeNumber AS ReporterEmployeeNumber
+                    FROM
+                        [Statistics] o
+                            LEFT JOIN
+                        Products p ON o.ProductId = p.Id
+                    LEFT JOIN
+                        Storages sInitial ON o.InitialStorageId = sInitial.Id
+                    LEFT JOIN
+                        Storages sDestination ON o.DestinationStorageId = sDestination.Id
+                    LEFT JOIN
+                        [AspNetUsers] uReporter ON o.UserId = uReporter.Id";
 
                 using (SqlCommand data = new SqlCommand(sqlQuery, connection))
                 {

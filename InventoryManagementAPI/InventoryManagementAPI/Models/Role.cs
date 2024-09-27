@@ -5,6 +5,9 @@ namespace InventoryManagementAPI.Models
 {
 	public class Role : IdentityRole
 	{
+        [JsonPropertyName("id")]
+        public override string Id { get; set; }
+
 		[JsonPropertyName("roleName")]
 		public string RoleName { get; set; }
 
