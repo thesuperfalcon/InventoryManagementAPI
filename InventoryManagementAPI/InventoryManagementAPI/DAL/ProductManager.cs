@@ -49,7 +49,7 @@ namespace InventoryManagementAPI.DAL
                     Product = existingProduct,
                     Storage = defaultStorage,
                 };
-                defaultStorage.CurrentStock = existingProduct.TotalStock;
+                defaultStorage.CurrentStock += existingProduct.TotalStock;
                 _context.InventoryTracker.Update(productTracker);
                 _context.Products.Update(existingProduct);
                 _context.Storages.Update(defaultStorage);
