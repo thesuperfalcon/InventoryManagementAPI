@@ -52,7 +52,51 @@ namespace InventoryManagementAPI.Data
             Storages.Add(defaultSlot);
             await SaveChangesAsync();
         }
-        
+        public  async Task SeedRolesAndAdminUser(RoleManager<Role> roleManager, UserManager<User> userManager)
+        {
+
+            var roles = new[] { "Admin" };
+            
+            // Skapa roller
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    var newRole = new Models.Role
+                    {
+                        Name = role,
+                        NormalizedName = role.ToUpper(),
+                        FullAccess = (role == "Admin"),
+                        RoleName = role
+                    };
+                    await roleManager.CreateAsync(newRole);
+
+                }
+            }
+           
+            // Om admin inte finns, skapa rollen vid start
+            var adminUserName = "AdminUser";
+            var adminPassword = "AdminUser123!";
+            string roleId = roleManager.Roles.FirstOrDefault()?.Id;
+            var adminUser = await userManager.FindByNameAsync(adminUserName);
+            if (adminUser == null)
+            {
+                adminUser = new Models.User
+                {
+                    UserName = adminUserName,
+                    RoleId = roleId,
+                    EmployeeNumber = "0000",
+                    FirstName = "Admin",
+                    LastName = "User"
+                };
+
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                if (result.Succeeded)
+                {                   
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
+        }
         public async Task SeedTestDataAsync()
         {
             if (await Products.AnyAsync() && await Storages.AnyAsync())
