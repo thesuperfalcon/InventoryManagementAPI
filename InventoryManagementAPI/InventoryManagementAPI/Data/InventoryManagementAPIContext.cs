@@ -41,7 +41,7 @@ namespace InventoryManagementAPI.Data
 
             var defaultSlot = new Storage
             {
-                Name = "Default",
+                Name = "Standardlager",
                 CurrentStock = 50,
                 MaxCapacity = null,
                 Created = DateTime.UtcNow,
@@ -143,7 +143,7 @@ namespace InventoryManagementAPI.Data
             Storages.AddRange(storage1, storage2);
             await SaveChangesAsync(); 
 
-            var storageDefault = Storages.Where(x => x.Name == "Default").FirstOrDefault();
+            var storageDefault = Storages.Where(x => x.Name == "Standardlager").FirstOrDefault();
 
             var inventoryTracker1 = new InventoryTracker
             {

@@ -41,7 +41,7 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet("DefaultStorage")]
         public async Task <Storage> GetDefaultStorageAsync()
         {
-            return await _context.Storages.Where(x => x.Name == "Default").FirstOrDefaultAsync();
+            return await _context.Storages.Where(x => x.Name == "Standardlager").FirstOrDefaultAsync();
         }
 
         [HttpGet]

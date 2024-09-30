@@ -35,7 +35,7 @@ namespace InventoryManagementAPI.DAL
         public async Task SendProductToDefaultStorageAsync(int id, Product product)
         {
             var existingProduct = await _context.Products.FindAsync(id);
-            var defaultStorage = await _context.Storages.FirstOrDefaultAsync(x => x.Name == "Default");
+            var defaultStorage = await _context.Storages.FirstOrDefaultAsync(x => x.Name == "Standardlager");
 
 
             if(existingProduct != null)
