@@ -63,8 +63,8 @@ namespace InventoryManagementAPI.Controllers
             {
                 // Hårdkodat lösenord vid reset
                 var newPassword = "Admin123!";
-                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var resetResult = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(userToUpdate);
+                var resetResult = await _userManager.ResetPasswordAsync(userToUpdate, resetToken, newPassword);
                 return Ok();
             }
             else
