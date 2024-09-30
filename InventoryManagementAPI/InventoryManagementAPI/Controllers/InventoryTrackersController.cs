@@ -83,15 +83,23 @@ namespace InventoryManagementAPI.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetInventoryTracker()
+        public async Task<IActionResult> GetInventoryTracker(bool includeZeroQuantity = true)
         {
-            var inventoryTracker = await _context.InventoryTracker
+            var query = _context.InventoryTracker
                 .Include(x => x.Product)
                 .Include(x => x.Storage)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!includeZeroQuantity)
+            {
+                query = query.Where(x => x.Quantity > 0);
+            }
+
+            var inventoryTracker = await query.ToListAsync();
 
             return Ok(inventoryTracker);
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetInventoryTrackerById(int id)
