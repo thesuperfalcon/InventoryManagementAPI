@@ -108,7 +108,7 @@ namespace InventoryManagementAPI.Data
             {
                 Name = "Testprodukt",
                 ArticleNumber = "TP001",
-                CurrentStock = 0,
+                CurrentStock = 50,
                 TotalStock = 50,
                 Description = "Detta är en testprodukt.",
                 Price = 99.99m,
@@ -151,8 +151,6 @@ namespace InventoryManagementAPI.Data
                 ProductId = product.Id,
                 Quantity = 50
             };
-
-           
 
             InventoryTracker.AddRange(inventoryTracker1);
             await SaveChangesAsync(); 
