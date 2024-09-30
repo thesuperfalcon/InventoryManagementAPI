@@ -4,6 +4,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryManagementAPI
 {
@@ -26,17 +27,20 @@ namespace InventoryManagementAPI
                 options.JsonSerializerOptions.WriteIndented = true; // F�r l�sbarhet
             });
 
-            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            builder.Services.AddIdentity<User, Role>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequireNonAlphanumeric = false;
-            }).AddEntityFrameworkStores<InventoryManagementAPIContext>().AddDefaultTokenProviders();
+            }).AddEntityFrameworkStores<InventoryManagementAPIContext>()
+            .AddDefaultTokenProviders();
 
-
+            
             builder.Services.AddScoped<StorageManager>();
             builder.Services.AddScoped<InventoryTrackerManager>();
             builder.Services.AddScoped<ProductManager>();
+            //builder.Services.AddScoped<UserManager<User>();
+            //builder.Services.AddScoped<RoleManager<Role>();
 
             //builder.Services.AddEntityFrameworkStores<InventoryManagementAPIContext>();
 
@@ -61,12 +65,20 @@ namespace InventoryManagementAPI
             // Anropa SeedTestDataAsync f�r att skapa testdata
             using (var scope = app.Services.CreateScope())
             {
+                var services = scope.ServiceProvider;
+                var roleManager = services.GetRequiredService<RoleManager<InventoryManagementAPI.Models.Role>>();
+                var userManager = services.GetRequiredService<UserManager<InventoryManagementAPI.Models.User>>();
+               
                 var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
                 await context.CreateDefaultSlot();
                 await context.SeedTestDataAsync();
+                await context.SeedRolesAndAdminUser(roleManager, userManager);
+                
+                //await Data.InventoryManagementAPIContext.SeedRolesAndAdminUser(roleManager, userManager);
             }
 
             app.Run();
         }
+
     }
 }

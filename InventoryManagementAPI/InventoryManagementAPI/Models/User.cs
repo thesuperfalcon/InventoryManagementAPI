@@ -6,7 +6,10 @@ namespace InventoryManagementAPI.Models
 {
     public class User : IdentityUser
     {
-        [JsonPropertyName("firstName")]
+		[JsonPropertyName("id")]
+		public override string Id { get; set; }
+
+		[JsonPropertyName("firstName")]
         [PersonalData]
         public string FirstName { get; set; }
 

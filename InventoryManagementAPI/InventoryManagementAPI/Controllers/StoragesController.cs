@@ -38,10 +38,16 @@ namespace InventoryManagementAPI.Controllers
             return Ok();
         }
 
+        [HttpGet("DefaultStorage")]
+        public async Task <Storage> GetDefaultStorageAsync()
+        {
+            return await _context.Storages.Where(x => x.Name == "Default").FirstOrDefaultAsync();
+        }
+
         [HttpGet]
         public async Task<List<Models.Storage>> GetStorages()
         {
-            var storages = await _context.Storages.ToListAsync();
+            var storages = await _context.Storages.Include(x => x.InventoryTrackers).ThenInclude(z => z.Product).ToListAsync();
             return storages;
         }
 
@@ -54,7 +60,7 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet("ExistingStorages")]
         public async Task<List<Models.Storage>> GetExistingStorages()
         {
-            var existingStorages = await _context.Storages.Where(x => x.IsDeleted == false).ToListAsync();
+            var existingStorages = await _context.Storages.Where(x => x.IsDeleted == false).Include(z => z.InventoryTrackers).ThenInclude(x => x.Product).ToListAsync();
             return existingStorages;        
         }
 

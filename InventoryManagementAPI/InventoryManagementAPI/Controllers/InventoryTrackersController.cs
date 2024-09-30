@@ -9,19 +9,19 @@ using InventoryManagementAPI.DAL;
 
 namespace InventoryManagementAPI.Controllers
 {
-	[ApiController]
-	[Route("api/[controller]")]
+    [ApiController]
+    [Route("api/[controller]")]
 
-	public class InventoryTrackersController : Controller
-	{
-		private readonly InventoryManagementAPIContext _context;
+    public class InventoryTrackersController : Controller
+    {
+        private readonly InventoryManagementAPIContext _context;
         private readonly InventoryTrackerManager _trackerManager;
 
-		public InventoryTrackersController(InventoryManagementAPIContext context, InventoryTrackerManager trackerManager)
-		{
-			_context = context;
+        public InventoryTrackersController(InventoryManagementAPIContext context, InventoryTrackerManager trackerManager)
+        {
+            _context = context;
             _trackerManager = trackerManager;
-		}
+        }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] InventoryTrackerDto inventoryTrackerDto)
@@ -69,6 +69,18 @@ namespace InventoryManagementAPI.Controllers
             return Ok();
         }
 
+        [HttpGet("{productId?}/{storageId?}")]
+        public async Task<IActionResult> GetTrackersByStorageAndProductId(int? productId, int? storageId)
+        {
+
+            var invntoryTracker = await _trackerManager.GetTrackersByStorageAndProductIdAsync(productId, storageId);
+            if(invntoryTracker.Count <= 0)
+            {
+                return BadRequest("inga inventorytrackers hittades på dina input idn");
+            }
+            return Ok(invntoryTracker);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetInventoryTracker()
@@ -82,31 +94,31 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("{id}")]
-		public async Task<IActionResult>GetInventoryTrackerById(int id)
-		{
+        public async Task<IActionResult> GetInventoryTrackerById(int id)
+        {
             var inventoryTracker = await _context.InventoryTracker
                .Include(x => x.Product)
                .Include(x => x.Storage)
                .Where(x => x.Id == id)
-               .ToListAsync();
+               .FirstOrDefaultAsync();
 
             return Ok(inventoryTracker);
         }
 
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteInventoryTracker(int id)
-		{
-			var inventoryTracker = await _context.InventoryTracker.FindAsync(id);
-			if (inventoryTracker == null)
-			{
-				return NotFound();
-			}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteInventoryTracker(int id)
+        {
+            var inventoryTracker = await _context.InventoryTracker.FindAsync(id);
+            if (inventoryTracker == null)
+            {
+                return NotFound();
+            }
 
-			_context.InventoryTracker.Remove(inventoryTracker);
-			await _context.SaveChangesAsync();
-			return Ok();
-		}
-	}
+            _context.InventoryTracker.Remove(inventoryTracker);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+    }
 
 }
 

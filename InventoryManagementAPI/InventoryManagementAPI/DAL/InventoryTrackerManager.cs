@@ -1,5 +1,6 @@
 ﻿using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client.Extensions.Msal;
 
 namespace InventoryManagementAPI.DAL
@@ -30,11 +31,37 @@ namespace InventoryManagementAPI.DAL
                 existingTracker.Storage = storage;
 
                 _context.InventoryTracker.Update(existingTracker);
+
                 await _context.SaveChangesAsync();
-
-                Console.WriteLine("har ändrats!!!!");
-
             }
+        }
+
+        public async Task<List<InventoryTracker>> GetTrackersByStorageAndProductIdAsync(int? productId, int? storageId)
+        {
+            List<InventoryTracker> inventoryTrackers = await _context.InventoryTracker.ToListAsync();
+
+            List<InventoryTracker> selectedInventoryTrackers = new List<InventoryTracker>();
+
+
+            switch (productId, storageId)
+            {
+                case (int inputProduct, int inputStorage) when inputProduct > 0 && inputStorage <= 0:
+                    selectedInventoryTrackers = inventoryTrackers.Where(x => x.ProductId == inputProduct).ToList();
+                    break;
+
+                case (int inputProduct, int inputStorage) when inputStorage > 0 && inputProduct <= 0:
+                    selectedInventoryTrackers = inventoryTrackers.Where(x => x.StorageId == inputStorage).ToList();
+                    break;
+
+                case (int inputProduct, int inputStorage) when inputProduct > 0 && inputStorage > 0:
+                    selectedInventoryTrackers = inventoryTrackers.Where(x => x.StorageId == inputStorage && x.ProductId == inputProduct).ToList();
+                    break;
+
+                default:
+                    break;
+            }
+
+            return selectedInventoryTrackers;
         }
     }
 }
