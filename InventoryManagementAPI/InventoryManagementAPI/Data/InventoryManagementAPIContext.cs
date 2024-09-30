@@ -8,11 +8,17 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection.Emit;
 using Microsoft.Build.Framework;
+using Microsoft.AspNetCore.Identity;
+using InventoryManagementAPI.Controllers;
+using System.Data;
+using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryManagementAPI.Data
 {
-    public class InventoryManagementAPIContext : IdentityDbContext<User>
+    public class InventoryManagementAPIContext : IdentityDbContext<User, Models.Role, string>
     {
+
+
         public InventoryManagementAPIContext (DbContextOptions<InventoryManagementAPIContext> options)
             : base(options)
         {
@@ -23,6 +29,8 @@ namespace InventoryManagementAPI.Data
         public DbSet<InventoryManagementAPI.Models.Statistic> Statistics { get; set; } 
         public DbSet<InventoryManagementAPI.Models.ActivityLog> ActivityLog { get; set; }
         public DbSet<InventoryManagementAPI.Models.InventoryTracker> InventoryTracker { get; set; }
+        public DbSet<InventoryManagementAPI.Models.Role> AspNetRoles {  get; set; }
+        public DbSet<InventoryManagementAPI.Models.User> Users {  get; set; }
 
         public async Task CreateDefaultSlot()
         {
@@ -44,7 +52,51 @@ namespace InventoryManagementAPI.Data
             Storages.Add(defaultSlot);
             await SaveChangesAsync();
         }
+        public  async Task SeedRolesAndAdminUser(RoleManager<Role> roleManager, UserManager<User> userManager)
+        {
 
+            var roles = new[] { "Admin" };
+            
+            // Skapa roller
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    var newRole = new Models.Role
+                    {
+                        Name = role,
+                        NormalizedName = role.ToUpper(),
+                        FullAccess = (role == "Admin"),
+                        RoleName = role
+                    };
+                    await roleManager.CreateAsync(newRole);
+
+                }
+            }
+           
+            // Om admin inte finns, skapa rollen vid start
+            var adminUserName = "AdminUser";
+            var adminPassword = "AdminUser123!";
+            string roleId = roleManager.Roles.FirstOrDefault()?.Id;
+            var adminUser = await userManager.FindByNameAsync(adminUserName);
+            if (adminUser == null)
+            {
+                adminUser = new Models.User
+                {
+                    UserName = adminUserName,
+                    RoleId = roleId,
+                    EmployeeNumber = "0000",
+                    FirstName = "Admin",
+                    LastName = "User"
+                };
+
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                if (result.Succeeded)
+                {                   
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
+        }
         public async Task SeedTestDataAsync()
         {
             if (await Products.AnyAsync() && await Storages.AnyAsync())
@@ -129,7 +181,12 @@ namespace InventoryManagementAPI.Data
 
             builder.Entity<Product>()
                 .Property(p => p.Id)
-                .ValueGeneratedOnAdd();  
+                .ValueGeneratedOnAdd();
+
+
+            //builder.Entity<IdentityRole>()
+            //    .HasOne(s => s.Id)
+            //    .WithMany(s => s.);
 
         }
     }

@@ -1,4 +1,5 @@
 ﻿using InventoryManagementAPI.Data;
+using InventoryManagementAPI.DTO;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,12 +40,59 @@ namespace InventoryManagementAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok();
         }
-        [HttpPut]
-        public async Task<IActionResult> Put([FromBody] Models.User users)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromBody] RoleDTO affectRole)
         {
-            _context.Update(users);
-            await _context.SaveChangesAsync();
-            return Ok();
+            var user = affectRole.User;
+
+            // Av någon anledning sparar den inte in i databasen om jag använder user direkt utan måste hämta userToUpdate 
+            // och uppdatera genom den variabeln istället
+
+            var userToUpdate = await _context.Users.FindAsync(user.Id);
+            if (affectRole.CurrentRoles == null && affectRole.AddRole == null && affectRole.ResetPassword == false)
+            {
+                userToUpdate.FirstName = user.FirstName;
+                userToUpdate.LastName = user.LastName;
+                userToUpdate.EmployeeNumber = user.EmployeeNumber;
+
+                _context.Users.Update(userToUpdate);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            else if(affectRole.ResetPassword == true)
+            {
+                // Hårdkodat lösenord vid reset
+                var newPassword = "Admin123!";
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetResult = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+                return Ok();
+            }
+            else
+            {
+                
+                var rolesToAffect = affectRole.CurrentRoles;
+                var roleToAdd = affectRole.AddRole;
+                if(affectRole.CurrentRoles != null)
+                {
+                    await _userManager.RemoveFromRolesAsync(user, rolesToAffect);
+                    userToUpdate.RoleId = null;
+                    _context.Users.Update(userToUpdate);
+                    await _context.SaveChangesAsync();
+                    return Ok();
+                }
+                else if(roleToAdd != null)
+                {
+                    var roleId = _context.Roles.FirstOrDefault(r => r.Name == roleToAdd);
+                    await _userManager.AddToRoleAsync(userToUpdate, roleToAdd);
+                    userToUpdate.RoleId = roleId.Id;
+                    _context.Users.Update(userToUpdate);
+                    await _context.SaveChangesAsync();
+                    return Ok();
+                }
+                return Ok();
+                
+            }
+            
 
 
 
@@ -56,23 +104,37 @@ namespace InventoryManagementAPI.Controllers
         {
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
+   //         return users.Select(u => new Models.User
+			//{
+   //             Id = u.Id,
+   //             FirstName = u.FirstName,
+   //             LastName = u.LastName,
+   //             EmployeeNumber = u.EmployeeNumber,
+   //             RoleId = u.RoleId,
+   //             Created = u.Created,
+   //             Updated = u.Updated
+
+
+   //         }).ToList();
         }
+
         [HttpGet("{id}")]
         public async Task<Models.User> GetUserById(string id)
         {
             var user = await _context.Users.FindAsync(id);
             return user;
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(users);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return Ok();
         }
