@@ -22,15 +22,19 @@ namespace InventoryManagementAPI.Controllers
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
             _userManager = userManager;
-
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.User user)
         {
             
             user.Id = Guid.NewGuid().ToString();
-            user.UserName = user.EmployeeNumber;
-            user.NormalizedUserName = user.EmployeeNumber;
+
+            string firstTwoLettersFirstName = user.FirstName.Length >= 2 ? user.FirstName.Substring(0, 2).ToLower() : user.FirstName.ToLower();
+            string firstTwoLettersLastName = user.LastName.Length >= 2 ? user.LastName.Substring(0, 2).ToLower() : user.LastName.ToLower();
+            user.UserName = $"{firstTwoLettersFirstName}{firstTwoLettersLastName}{user.EmployeeNumber.ToLower()}";
+            //user.UserName = user.EmployeeNumber;
+            user.NormalizedUserName = $"{firstTwoLettersFirstName}{firstTwoLettersLastName}{user.EmployeeNumber.ToLower()}";
+            //user.NormalizedUserName = user.EmployeeNumber;
             user.RoleId = null;
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
@@ -89,14 +93,8 @@ namespace InventoryManagementAPI.Controllers
                     await _context.SaveChangesAsync();
                     return Ok();
                 }
-                return Ok();
-                
+                return Ok();                
             }
-            
-
-
-
-
         }
 
         [HttpGet]
