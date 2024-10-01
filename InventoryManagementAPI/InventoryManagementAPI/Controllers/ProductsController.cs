@@ -47,6 +47,11 @@ namespace InventoryManagementAPI.Controllers
         {
             return await _context.Products.ToListAsync();
         }
+        [HttpGet("ByArticleNumber/{articleNumber}")]
+        public async Task<Product> GetProductBySKU(string articleNumber)
+        {
+            return await _context.Products.FirstOrDefaultAsync(x => x.ArticleNumber == articleNumber);
+        }
 
         [HttpGet("{id}")]
         public async Task <Models.Product> GetProductById(int id)
@@ -96,8 +101,6 @@ namespace InventoryManagementAPI.Controllers
             }
             else
             {
-                var statistics = await _context.Statistics.Where(x => x.ProductId == product.Id).ToListAsync();
-                _context.Statistics.RemoveRange(statistics);
                 _context.Products.Remove(product);
             }
             await _context.SaveChangesAsync();
