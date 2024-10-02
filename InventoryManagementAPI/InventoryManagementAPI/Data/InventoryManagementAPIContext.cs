@@ -27,10 +27,10 @@ namespace InventoryManagementAPI.Data
         public DbSet<InventoryManagementAPI.Models.Product> Products { get; set; }
         public DbSet<InventoryManagementAPI.Models.Storage> Storages { get; set; }
         public DbSet<InventoryManagementAPI.Models.Statistic> Statistics { get; set; } 
-        public DbSet<InventoryManagementAPI.Models.ActivityLog> ActivityLog { get; set; }
         public DbSet<InventoryManagementAPI.Models.InventoryTracker> InventoryTracker { get; set; }
         public DbSet<InventoryManagementAPI.Models.Role> AspNetRoles {  get; set; }
         public DbSet<InventoryManagementAPI.Models.User> Users {  get; set; }
+        public DbSet<InventoryManagementAPI.Models.Log> Logs { get; set; }
 
         public async Task CreateDefaultSlot()
         {
@@ -41,7 +41,7 @@ namespace InventoryManagementAPI.Data
 
             var defaultSlot = new Storage
             {
-                Name = "Default",
+                Name = "Standardlager",
                 CurrentStock = 50,
                 MaxCapacity = null,
                 Created = DateTime.UtcNow,
@@ -143,7 +143,7 @@ namespace InventoryManagementAPI.Data
             Storages.AddRange(storage1, storage2);
             await SaveChangesAsync(); 
 
-            var storageDefault = Storages.Where(x => x.Name == "Default").FirstOrDefault();
+            var storageDefault = Storages.Where(x => x.Name == "Standardlager").FirstOrDefault();
 
             var inventoryTracker1 = new InventoryTracker
             {
@@ -160,32 +160,9 @@ namespace InventoryManagementAPI.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Statistic>()
-            .HasOne(s => s.InitialStorage)
-            .WithMany(s => s.StatisticInitialStorages)
-            .HasForeignKey(s => s.InitialStorageId);
-
-            builder.Entity<Statistic>()
-                .HasOne(s => s.DestinationStorage)
-                .WithMany(s => s.StatisticDestinationStorages)
-                .HasForeignKey(s => s.DestinationStorageId);
-
-            builder.Entity<Statistic>()
-                .HasOne(s => s.Product)
-                .WithMany(s => s.Statistics)
-                .HasForeignKey(s => s.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-
             builder.Entity<Product>()
                 .Property(p => p.Id)
                 .ValueGeneratedOnAdd();
-
-
-            //builder.Entity<IdentityRole>()
-            //    .HasOne(s => s.Id)
-            //    .WithMany(s => s.);
-
         }
     }
 }

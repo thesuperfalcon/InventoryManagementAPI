@@ -25,10 +25,7 @@ namespace InventoryManagementAPI.DAL
                 existingStorage.Created = storage.Created;
                 existingStorage.Updated = DateTime.Now;
                 existingStorage.IsDeleted = storage.IsDeleted;
-                existingStorage.ActivityLog = storage.ActivityLog;
                 existingStorage.InventoryTrackers = storage.InventoryTrackers;
-                existingStorage.StatisticDestinationStorages = storage.StatisticDestinationStorages;
-                existingStorage.StatisticInitialStorages = storage.StatisticInitialStorages;
 
                 _context.Storages.Update(existingStorage);
                 await _context.SaveChangesAsync();
