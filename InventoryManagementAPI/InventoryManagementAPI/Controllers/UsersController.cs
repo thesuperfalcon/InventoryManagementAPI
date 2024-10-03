@@ -59,6 +59,9 @@ namespace InventoryManagementAPI.Controllers
                 userToUpdate.LastName = user.LastName;
                 userToUpdate.EmployeeNumber = user.EmployeeNumber;
 
+                //Visar datumet för updaterad användare
+                userToUpdate.Updated = DateTime.Now;
+
                 _context.Users.Update(userToUpdate);
                 await _context.SaveChangesAsync();
                 return Ok();
