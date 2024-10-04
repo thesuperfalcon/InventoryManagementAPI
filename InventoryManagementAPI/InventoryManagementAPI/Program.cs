@@ -57,6 +57,8 @@ namespace InventoryManagementAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            // Så att huvudprogrammet kan hämta filer från API projektet.
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
             app.UseAuthorization();

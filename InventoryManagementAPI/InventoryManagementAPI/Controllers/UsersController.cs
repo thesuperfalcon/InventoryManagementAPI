@@ -38,7 +38,8 @@ namespace InventoryManagementAPI.Controllers
             user.RoleId = null;
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
-            user.TwoFactorEnabled = false;
+            user.ProfilePic = "https://localhost:44353/images/profile1.png";
+			user.TwoFactorEnabled = false;
             await _userManager.GenerateEmailConfirmationTokenAsync(user);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -58,6 +59,7 @@ namespace InventoryManagementAPI.Controllers
                 userToUpdate.FirstName = user.FirstName;
                 userToUpdate.LastName = user.LastName;
                 userToUpdate.EmployeeNumber = user.EmployeeNumber;
+                userToUpdate.ProfilePic = user.ProfilePic;
 
                 _context.Users.Update(userToUpdate);
                 await _context.SaveChangesAsync();
@@ -100,6 +102,7 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet]
         public async Task<List<Models.User>> GetUsers()
         {
+
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
    //         return users.Select(u => new Models.User
