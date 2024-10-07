@@ -129,13 +129,22 @@ namespace InventoryManagementAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
+            
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-
-            _context.Users.Remove(user);
+            if(user.IsDeleted == false)
+            {
+                user.IsDeleted = true;
+                _context.Users.Update(user);
+            }
+            else
+            {
+				_context.Users.Remove(user);
+			}
+           
             await _context.SaveChangesAsync();
             return Ok();
         }

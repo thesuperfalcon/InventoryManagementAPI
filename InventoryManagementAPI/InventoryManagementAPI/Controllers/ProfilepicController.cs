@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -33,7 +34,18 @@ namespace InventoryManagementAPI.Controllers
                 }
                 
             }
-            return picUrls;
+            List<string> sortedList = picUrls.OrderBy(url => ExtractNumberFromFile(url)).ToList();
+            return sortedList;
+        }
+
+        private int ExtractNumberFromFile(string url)
+        {
+            //Använder Regex för att sortera filerna i nummerordning
+
+            string fileName = url.Substring(url.LastIndexOf('/') + 1);
+            Match match = Regex.Match(fileName, @"\d+");
+
+            return match.Success ? int.Parse(match.Value) : 0;
         }
     }
 }
