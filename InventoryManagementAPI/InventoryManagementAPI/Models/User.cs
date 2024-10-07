@@ -60,5 +60,12 @@ namespace InventoryManagementAPI.Models
 		[JsonIgnore]
 		[PersonalData]
         public bool LockoutEnabled { get; set; }
+        [JsonPropertyName("profilePic")]
+
+        [PersonalData]
+        public string? ProfilePic { get; set; }
+
+        [JsonPropertyName("isDeleted")]
+        public bool? IsDeleted { get; set; } = false;
     }
 }
