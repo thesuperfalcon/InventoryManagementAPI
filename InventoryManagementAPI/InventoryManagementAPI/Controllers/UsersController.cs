@@ -35,6 +35,10 @@ namespace InventoryManagementAPI.Controllers
             //user.UserName = user.EmployeeNumber;
             user.NormalizedUserName = $"{firstTwoLettersFirstName}{firstTwoLettersLastName}{user.EmployeeNumber.ToLower()}";
             //user.NormalizedUserName = user.EmployeeNumber;
+
+            //Alicia: test för datum
+            user.Created = DateTime.Now;
+
             user.RoleId = null;
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
@@ -58,6 +62,10 @@ namespace InventoryManagementAPI.Controllers
                 userToUpdate.FirstName = user.FirstName;
                 userToUpdate.LastName = user.LastName;
                 userToUpdate.EmployeeNumber = user.EmployeeNumber;
+
+                //Uppdaterar användarnamnet vid ändring av förnamn och/eller efternamn
+                userToUpdate.UserName = user.UserName;
+                userToUpdate.NormalizedUserName = user.NormalizedUserName ?? user.UserName.ToUpper();
 
                 //Visar datumet för updaterad användare
                 userToUpdate.Updated = DateTime.Now;
