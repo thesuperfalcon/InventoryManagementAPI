@@ -87,7 +87,9 @@ namespace InventoryManagementAPI.Data
                     RoleId = roleId,
                     EmployeeNumber = "0000",
                     FirstName = "Admin",
-                    LastName = "User"
+                    LastName = "User",
+                    Created = DateTime.Now,
+                    Updated = DateTime.Now,
                 };
 
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
