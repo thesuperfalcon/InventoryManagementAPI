@@ -38,7 +38,8 @@ namespace InventoryManagementAPI.Controllers
             user.RoleId = null;
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
-            user.TwoFactorEnabled = false;
+            user.ProfilePic = "https://localhost:44353/images/profile1.png";
+			user.TwoFactorEnabled = false;
             await _userManager.GenerateEmailConfirmationTokenAsync(user);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -58,6 +59,10 @@ namespace InventoryManagementAPI.Controllers
                 userToUpdate.FirstName = user.FirstName;
                 userToUpdate.LastName = user.LastName;
                 userToUpdate.EmployeeNumber = user.EmployeeNumber;
+                userToUpdate.ProfilePic = user.ProfilePic;
+
+                //Visar datumet för updaterad användare
+                userToUpdate.Updated = DateTime.Now;
 
                 _context.Users.Update(userToUpdate);
                 await _context.SaveChangesAsync();
@@ -100,6 +105,7 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet]
         public async Task<List<Models.User>> GetUsers()
         {
+
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
    //         return users.Select(u => new Models.User
@@ -126,13 +132,22 @@ namespace InventoryManagementAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
+            
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-
-            _context.Users.Remove(user);
+            if(user.IsDeleted == false)
+            {
+                user.IsDeleted = true;
+                _context.Users.Update(user);
+            }
+            else
+            {
+				_context.Users.Remove(user);
+			}
+           
             await _context.SaveChangesAsync();
             return Ok();
         }

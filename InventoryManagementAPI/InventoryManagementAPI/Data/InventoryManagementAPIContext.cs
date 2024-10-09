@@ -87,7 +87,8 @@ namespace InventoryManagementAPI.Data
                     RoleId = roleId,
                     EmployeeNumber = "0000",
                     FirstName = "Admin",
-                    LastName = "User"
+                    LastName = "User",
+                    ProfilePic = "https://localhost:44353/images/profile1.png"
                 };
 
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
