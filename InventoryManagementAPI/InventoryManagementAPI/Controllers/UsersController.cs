@@ -108,18 +108,6 @@ namespace InventoryManagementAPI.Controllers
 
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
-   //         return users.Select(u => new Models.User
-			//{
-   //             Id = u.Id,
-   //             FirstName = u.FirstName,
-   //             LastName = u.LastName,
-   //             EmployeeNumber = u.EmployeeNumber,
-   //             RoleId = u.RoleId,
-   //             Created = u.Created,
-   //             Updated = u.Updated
-
-
-   //         }).ToList();
         }
 
         [HttpGet("{id}")]
@@ -127,6 +115,18 @@ namespace InventoryManagementAPI.Controllers
         {
             var user = await _context.Users.FindAsync(id);
             return user;
+        }
+
+        [HttpGet("ExistingUsers")]
+        public async Task<List<Models.User>> GetExistingUsers()
+        {
+            return await _context.Users.Where(x => x.IsDeleted == false).ToListAsync();
+        }
+
+        [HttpGet("DeletedUsers")]
+        public async Task<List<Models.User>> GetDeletedUsers()
+        {
+            return await _context.Users.Where(x => x.IsDeleted == true).ToListAsync();
         }
 
         [HttpDelete("{id}")]
