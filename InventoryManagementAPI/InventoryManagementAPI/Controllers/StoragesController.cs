@@ -82,7 +82,7 @@ namespace InventoryManagementAPI.Controllers
             return await _context.Storages.Where(x => x.IsDeleted == true).ToListAsync();
         }
 
-        [HttpGet("search")]
+        [HttpGet("SearchStorages")]
         public async Task<IActionResult> SearchStorages(string? name)
         {
             var query = _context.Storages.AsQueryable();

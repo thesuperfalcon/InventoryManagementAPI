@@ -121,7 +121,7 @@ namespace InventoryManagementAPI.Controllers
    //         }).ToList();
         }
 
-        [HttpGet("search")]
+        [HttpGet("SearchUsers")]
         public async Task<IActionResult> SearchUsers(string? name, string? employeeNumber)
         {
             var query = _context.Users.AsQueryable();

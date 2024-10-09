@@ -71,8 +71,8 @@ namespace InventoryManagementAPI.Controllers
             return await _context.Products.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchProducts(string? name, string? articleNumber)
+        [HttpGet("SearchProducts")]
+        public async Task<IActionResult> SearchProducts(string name, string? articleNumber)
         {
             var query = _context.Products.AsQueryable();
 
