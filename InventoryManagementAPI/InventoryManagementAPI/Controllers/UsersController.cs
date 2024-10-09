@@ -4,6 +4,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -16,6 +17,7 @@ namespace InventoryManagementAPI.Controllers
         private readonly InventoryManagementAPIContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
         private readonly UserManager<User> _userManager;
+
 
         public UsersController(InventoryManagementAPIContext context, UserManager<User> userManager )
         {
@@ -116,6 +118,43 @@ namespace InventoryManagementAPI.Controllers
 
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
+        }
+
+        [HttpGet("SearchUsers")]
+        public async Task<IActionResult> SearchUsers(string? name, string? employeeNumber)
+        {
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(x => EF.Functions.Like((x.FirstName + " " + x.LastName).ToLower(), $"%{name.ToLower()}%"));
+            }
+
+            if (!string.IsNullOrEmpty(employeeNumber))
+            {
+                query = query.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
+            }
+
+
+            //if (!string.IsNullOrEmpty(name))
+            //{
+            //    query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+            //}
+
+            //if (!string.IsNullOrEmpty(lastName))
+            //{
+            //    query = query.Where(x => x.LastName.ToLower().Contains(lastName.ToLower()));
+            //}
+
+            //if (!string.IsNullOrEmpty(employeeNumber))
+            //{
+            //    query = query.Where(x => x.EmployeeNumber.Contains(employeeNumber));
+            //}
+
+
+            var users = await query.ToListAsync();
+
+            return Ok(users);
         }
 
         [HttpGet("{id}")]

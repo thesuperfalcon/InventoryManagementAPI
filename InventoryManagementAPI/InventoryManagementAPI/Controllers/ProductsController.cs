@@ -71,6 +71,26 @@ namespace InventoryManagementAPI.Controllers
             return await _context.Products.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        [HttpGet("SearchProducts")]
+        public async Task<IActionResult> SearchProducts(string name, string? articleNumber)
+        {
+            var query = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(x => x.Name.Contains(name));
+            }
+
+            if (!string.IsNullOrEmpty(articleNumber))
+            {
+                query = query.Where(x => x.ArticleNumber.Contains(articleNumber));
+            }
+
+            var products = await query.ToListAsync();
+
+            return Ok(products);
+        }
+
         [HttpGet("DeletedProducts")]
         public async Task<List<Models.Product>> GetDeletedProducts()
         {
