@@ -82,6 +82,21 @@ namespace InventoryManagementAPI.Controllers
             return await _context.Storages.Where(x => x.IsDeleted == true).ToListAsync();
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchStorages(string? name)
+        {
+            var query = _context.Storages.AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(x => x.Name.Contains(name));
+            }
+
+            var storages = await query.ToListAsync();
+
+            return Ok(storages);
+        }
+
         [HttpGet("DeletedStorages/{id}")]
         public async Task<Models.Storage> GetDeletedStorageById(int id)
         {

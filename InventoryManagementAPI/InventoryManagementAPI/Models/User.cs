@@ -21,6 +21,8 @@ namespace InventoryManagementAPI.Models
         [PersonalData]
         public string EmployeeNumber { get; set; }
 
+        public string Name => $"{FirstName} {LastName}";
+
         [JsonPropertyName("roleId")]
         [PersonalData]
         public string? RoleId { get; set; }
