@@ -4,6 +4,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -16,6 +17,7 @@ namespace InventoryManagementAPI.Controllers
         private readonly InventoryManagementAPIContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
         private readonly UserManager<User> _userManager;
+
 
         public UsersController(InventoryManagementAPIContext context, UserManager<User> userManager )
         {
@@ -35,6 +37,10 @@ namespace InventoryManagementAPI.Controllers
             //user.UserName = user.EmployeeNumber;
             user.NormalizedUserName = $"{firstTwoLettersFirstName}{firstTwoLettersLastName}{user.EmployeeNumber.ToLower()}";
             //user.NormalizedUserName = user.EmployeeNumber;
+
+            //Alicia: test för datum
+            user.Created = DateTime.Now;
+
             user.RoleId = null;
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
@@ -60,6 +66,10 @@ namespace InventoryManagementAPI.Controllers
                 userToUpdate.LastName = user.LastName;
                 userToUpdate.EmployeeNumber = user.EmployeeNumber;
                 userToUpdate.ProfilePic = user.ProfilePic;
+
+                //Uppdaterar användarnamnet vid ändring av förnamn och/eller efternamn
+                userToUpdate.UserName = user.UserName;
+                userToUpdate.NormalizedUserName = user.NormalizedUserName ?? user.UserName.ToUpper();
 
                 //Visar datumet för updaterad användare
                 userToUpdate.Updated = DateTime.Now;
@@ -108,18 +118,43 @@ namespace InventoryManagementAPI.Controllers
 
             List<Models.User> users = await _context.Users.ToListAsync();
             return users;
-   //         return users.Select(u => new Models.User
-			//{
-   //             Id = u.Id,
-   //             FirstName = u.FirstName,
-   //             LastName = u.LastName,
-   //             EmployeeNumber = u.EmployeeNumber,
-   //             RoleId = u.RoleId,
-   //             Created = u.Created,
-   //             Updated = u.Updated
+        }
+
+        [HttpGet("SearchUsers")]
+        public async Task<IActionResult> SearchUsers(string? name, string? employeeNumber)
+        {
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(x => EF.Functions.Like((x.FirstName + " " + x.LastName).ToLower(), $"%{name.ToLower()}%"));
+            }
+
+            if (!string.IsNullOrEmpty(employeeNumber))
+            {
+                query = query.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
+            }
 
 
-   //         }).ToList();
+            //if (!string.IsNullOrEmpty(name))
+            //{
+            //    query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+            //}
+
+            //if (!string.IsNullOrEmpty(lastName))
+            //{
+            //    query = query.Where(x => x.LastName.ToLower().Contains(lastName.ToLower()));
+            //}
+
+            //if (!string.IsNullOrEmpty(employeeNumber))
+            //{
+            //    query = query.Where(x => x.EmployeeNumber.Contains(employeeNumber));
+            //}
+
+
+            var users = await query.ToListAsync();
+
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
@@ -127,6 +162,18 @@ namespace InventoryManagementAPI.Controllers
         {
             var user = await _context.Users.FindAsync(id);
             return user;
+        }
+
+        [HttpGet("ExistingUsers")]
+        public async Task<List<Models.User>> GetExistingUsers()
+        {
+            return await _context.Users.Where(x => x.IsDeleted == false).ToListAsync();
+        }
+
+        [HttpGet("DeletedUsers")]
+        public async Task<List<Models.User>> GetDeletedUsers()
+        {
+            return await _context.Users.Where(x => x.IsDeleted == true).ToListAsync();
         }
 
         [HttpDelete("{id}")]

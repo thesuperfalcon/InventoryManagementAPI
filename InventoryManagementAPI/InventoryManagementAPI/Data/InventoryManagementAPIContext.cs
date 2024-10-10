@@ -88,6 +88,8 @@ namespace InventoryManagementAPI.Data
                     EmployeeNumber = "0000",
                     FirstName = "Admin",
                     LastName = "User",
+                    Created = DateTime.Now,
+                    Updated = DateTime.Now,
                     ProfilePic = "https://localhost:44353/images/profile1.png"
                 };
 
