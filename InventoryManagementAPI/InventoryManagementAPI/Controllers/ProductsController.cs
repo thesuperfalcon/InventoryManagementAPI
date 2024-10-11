@@ -72,7 +72,7 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchProducts")]
-        public async Task<IActionResult> SearchProducts(string name, string? articleNumber)
+        public async Task<IActionResult> SearchProducts(string? name, string? articleNumber)
         {
             var query = _context.Products.AsQueryable();
 

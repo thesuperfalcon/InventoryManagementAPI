@@ -135,23 +135,6 @@ namespace InventoryManagementAPI.Controllers
                 query = query.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
             }
 
-
-            //if (!string.IsNullOrEmpty(name))
-            //{
-            //    query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
-            //}
-
-            //if (!string.IsNullOrEmpty(lastName))
-            //{
-            //    query = query.Where(x => x.LastName.ToLower().Contains(lastName.ToLower()));
-            //}
-
-            //if (!string.IsNullOrEmpty(employeeNumber))
-            //{
-            //    query = query.Where(x => x.EmployeeNumber.Contains(employeeNumber));
-            //}
-
-
             var users = await query.ToListAsync();
 
             return Ok(users);
