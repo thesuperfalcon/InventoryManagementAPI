@@ -74,19 +74,24 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet("SearchProducts")]
         public async Task<IActionResult> SearchProducts(string? name, string? articleNumber)
         {
-            var query = _context.Products.AsQueryable();
-
+            var products = new List<Product>();
+            //var query = _context.Products.AsQueryable();
+            var queryN = _context.Products.AsQueryable();
+            var queryA = _context.Products.AsQueryable();
             if (!string.IsNullOrEmpty(name))
             {
-                query = query.Where(x => x.Name.Contains(name));
+                queryN = queryN.Where(x => x.Name.Contains(name));
             }
 
             if (!string.IsNullOrEmpty(articleNumber))
             {
-                query = query.Where(x => x.ArticleNumber.Contains(articleNumber));
+                queryA = queryA.Where(x => x.ArticleNumber.Contains(articleNumber));
             }
 
-            var products = await query.ToListAsync();
+            
+            products.AddRange(await queryN.ToListAsync());
+
+            products.AddRange(await queryA.ToListAsync());
 
             return Ok(products);
         }

@@ -4,7 +4,6 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -19,7 +18,7 @@ namespace InventoryManagementAPI.Controllers
         private readonly UserManager<User> _userManager;
 
 
-        public UsersController(InventoryManagementAPIContext context, UserManager<User> userManager )
+        public UsersController(InventoryManagementAPIContext context, UserManager<User> userManager)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
@@ -28,7 +27,7 @@ namespace InventoryManagementAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.User user)
         {
-            
+
             user.Id = Guid.NewGuid().ToString();
 
             string firstTwoLettersFirstName = user.FirstName.Length >= 2 ? user.FirstName.Substring(0, 2).ToLower() : user.FirstName.ToLower();
@@ -45,7 +44,7 @@ namespace InventoryManagementAPI.Controllers
             user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
             user.EmailConfirmed = false;
             user.ProfilePic = "https://localhost:44353/images/profile1.png";
-			user.TwoFactorEnabled = false;
+            user.TwoFactorEnabled = false;
             await _userManager.GenerateEmailConfirmationTokenAsync(user);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -78,7 +77,7 @@ namespace InventoryManagementAPI.Controllers
                 await _context.SaveChangesAsync();
                 return Ok();
             }
-            else if(affectRole.ResetPassword == true)
+            else if (affectRole.ResetPassword == true)
             {
                 // Hårdkodat lösenord vid reset
                 var newPassword = "Admin123!";
@@ -88,10 +87,10 @@ namespace InventoryManagementAPI.Controllers
             }
             else
             {
-                
+
                 var rolesToAffect = affectRole.CurrentRoles;
                 var roleToAdd = affectRole.AddRole;
-                if(affectRole.CurrentRoles != null)
+                if (affectRole.CurrentRoles != null)
                 {
                     await _userManager.RemoveFromRolesAsync(user, rolesToAffect);
                     userToUpdate.RoleId = null;
@@ -99,7 +98,7 @@ namespace InventoryManagementAPI.Controllers
                     await _context.SaveChangesAsync();
                     return Ok();
                 }
-                else if(roleToAdd != null)
+                else if (roleToAdd != null)
                 {
                     var roleId = _context.Roles.FirstOrDefault(r => r.Name == roleToAdd);
                     await _userManager.AddToRoleAsync(userToUpdate, roleToAdd);
@@ -108,7 +107,7 @@ namespace InventoryManagementAPI.Controllers
                     await _context.SaveChangesAsync();
                     return Ok();
                 }
-                return Ok();                
+                return Ok();
             }
         }
 
@@ -123,19 +122,21 @@ namespace InventoryManagementAPI.Controllers
         [HttpGet("SearchUsers")]
         public async Task<IActionResult> SearchUsers(string? name, string? employeeNumber)
         {
-            var query = _context.Users.AsQueryable();
-
+            List<User> users = new List<User>();
+            var queryN = _context.Users.AsQueryable();
+            var queryE = _context.Users.AsQueryable();
             if (!string.IsNullOrEmpty(name))
             {
-                query = query.Where(x => EF.Functions.Like((x.FirstName + " " + x.LastName).ToLower(), $"%{name.ToLower()}%"));
+                queryN = queryN.Where(x => EF.Functions.Like((x.FirstName + " " + x.LastName).ToLower(), $"%{name.ToLower()}%"));
             }
 
             if (!string.IsNullOrEmpty(employeeNumber))
             {
-                query = query.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
+                queryE = queryE.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
             }
+            users.AddRange(await queryN.ToListAsync());
 
-            var users = await query.ToListAsync();
+            users.AddRange(await queryE.ToListAsync());
 
             return Ok(users);
         }
@@ -162,22 +163,22 @@ namespace InventoryManagementAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            
+
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-            if(user.IsDeleted == false)
+            if (user.IsDeleted == false)
             {
                 user.IsDeleted = true;
                 _context.Users.Update(user);
             }
             else
             {
-				_context.Users.Remove(user);
-			}
-           
+                _context.Users.Remove(user);
+            }
+
             await _context.SaveChangesAsync();
             return Ok();
         }
