@@ -83,13 +83,18 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchStorages")]
-        public async Task<IActionResult> SearchStorages(string? name)
+        public async Task<IActionResult> SearchStorages(string? inputValue)
         {
             var query = _context.Storages.AsQueryable();
 
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(inputValue))
             {
-                query = query.Where(x => x.Name.Contains(name));
+                var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                query = query.Where(x => x.IsDeleted == false && (
+                searchTerms.All(term => x.Name.Contains(term))));
+
+                // lägg till fler searchTerms ifall man vill kunna söka fler atributer
             }
 
             var storages = await query.ToListAsync();

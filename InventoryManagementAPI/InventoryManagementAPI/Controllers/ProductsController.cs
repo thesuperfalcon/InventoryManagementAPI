@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using InventoryManagementAPI.DAL;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -72,26 +73,25 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchProducts")]
-        public async Task<IActionResult> SearchProducts(string? name, string? articleNumber)
+        public async Task<IActionResult> SearchProducts(string? inputValue)
         {
-            var products = new List<Product>();
-            //var query = _context.Products.AsQueryable();
-            var queryN = _context.Products.AsQueryable();
-            var queryA = _context.Products.AsQueryable();
-            if (!string.IsNullOrEmpty(name))
+            var query = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(inputValue))
             {
-                queryN = queryN.Where(x => x.Name.Contains(name));
+                var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                query = query.Where(x => x.IsDeleted == false && (
+                searchTerms.All(term => x.Name.Contains(term)) ||
+                searchTerms.All(term => x.ArticleNumber.Contains(term)) ||
+                searchTerms.All(term => x.Description.Contains(term)) ||
+                searchTerms.All(term => x.Price.ToString().Contains(term)) ||
+                searchTerms.All(term => x.TotalStock.ToString().Contains(term))));
+
+                // lägg till fler searchTerms ifall man vill kunna söka fler atributer
             }
 
-            if (!string.IsNullOrEmpty(articleNumber))
-            {
-                queryA = queryA.Where(x => x.ArticleNumber.Contains(articleNumber));
-            }
-
-            
-            products.AddRange(await queryN.ToListAsync());
-
-            products.AddRange(await queryA.ToListAsync());
+            var products = await query.ToListAsync();
 
             return Ok(products);
         }

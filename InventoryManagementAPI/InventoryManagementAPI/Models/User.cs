@@ -69,5 +69,8 @@ namespace InventoryManagementAPI.Models
 
         [JsonPropertyName("isDeleted")]
         public bool? IsDeleted { get; set; } = false;
+
+        [JsonPropertyName("userName")]
+        public string UserName { get; set; }
     }
 }

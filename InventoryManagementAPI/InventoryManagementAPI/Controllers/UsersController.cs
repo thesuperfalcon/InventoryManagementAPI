@@ -4,6 +4,7 @@ using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -120,23 +121,25 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchUsers")]
-        public async Task<IActionResult> SearchUsers(string? name, string? employeeNumber)
+        public async Task<IActionResult> SearchUsers(string? inputValue)
         {
-            List<User> users = new List<User>();
-            var queryN = _context.Users.AsQueryable();
-            var queryE = _context.Users.AsQueryable();
-            if (!string.IsNullOrEmpty(name))
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(inputValue))
             {
-                queryN = queryN.Where(x => EF.Functions.Like((x.FirstName + " " + x.LastName).ToLower(), $"%{name.ToLower()}%"));
+                var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                query = query.Where(x => x.IsDeleted == false && (
+                searchTerms.All(term => x.FirstName.Contains(term)) ||
+                searchTerms.All(term => x.LastName.Contains(term)) ||
+                searchTerms.All(term => x.UserName.Contains(term)) ||
+                searchTerms.All(term => x.EmployeeNumber.Contains(term))));
+
+                // lägg till fler searchTerms ifall man vill kunna söka fler atributer
+
             }
 
-            if (!string.IsNullOrEmpty(employeeNumber))
-            {
-                queryE = queryE.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
-            }
-            users.AddRange(await queryN.ToListAsync());
-
-            users.AddRange(await queryE.ToListAsync());
+            var users = await query.ToListAsync();
 
             return Ok(users);
         }
