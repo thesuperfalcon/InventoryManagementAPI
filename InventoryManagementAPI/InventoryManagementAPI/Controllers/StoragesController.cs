@@ -52,9 +52,10 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("ByStorageName/{storageName}")]
-        public async Task<Models.Storage> GetStorageByNameAsync(string storageName)
+        public async Task<bool> GetStorageByNameAsync(string storageName)
         {
-            return await _context.Storages.FirstOrDefaultAsync(x => x.Name == storageName);
+            var storage = await _context.Storages.FirstOrDefaultAsync(x => x.Name == storageName && x.IsDeleted == false);
+            return storage != null ? true : false;
         }
 
         [HttpGet("{id}")]

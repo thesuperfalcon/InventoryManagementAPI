@@ -108,6 +108,12 @@ namespace InventoryManagementAPI.Controllers
         {
             return await _context.Products.Where(x => x.IsDeleted == true).FirstOrDefaultAsync(x => x.Id == id);
         }
+        [HttpGet("ProductByName/{name}")]
+        public async Task<bool> GetProductByName(string name)
+        {
+            var product = await _context.Products.Where(x => x.Name == name && x.IsDeleted == false).FirstOrDefaultAsync();
+            return product != null ? true : false;
+        }
 
 
         [HttpDelete("{id}")]
@@ -123,6 +129,8 @@ namespace InventoryManagementAPI.Controllers
             if (!(bool)product.IsDeleted)
             {
                 product.IsDeleted = true;
+                product.TotalStock = 0;
+                product.CurrentStock = 0;
             }
             else
             {
