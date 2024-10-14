@@ -74,6 +74,8 @@ namespace InventoryManagementAPI.Controllers
                 //Visar datumet för updaterad användare
                 userToUpdate.Updated = DateTime.Now;
 
+                userToUpdate.IsDeleted = user.IsDeleted;
+
                 _context.Users.Update(userToUpdate);
                 await _context.SaveChangesAsync();
                 return Ok();
