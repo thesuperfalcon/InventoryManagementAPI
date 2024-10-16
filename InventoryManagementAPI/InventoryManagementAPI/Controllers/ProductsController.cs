@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
-using System.Text.Json.Serialization;
-using System.Text.Json;
+
 using InventoryManagementAPI.DAL;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
+
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -87,8 +80,6 @@ namespace InventoryManagementAPI.Controllers
                 searchTerms.All(term => x.Description.Contains(term)) ||
                 searchTerms.All(term => x.Price.ToString().Contains(term)) ||
                 searchTerms.All(term => x.TotalStock.ToString().Contains(term))));
-
-                // lägg till fler searchTerms ifall man vill kunna söka fler atributer
             }
 
             var products = await query.ToListAsync();
@@ -126,7 +117,7 @@ namespace InventoryManagementAPI.Controllers
                 return NotFound();
             }
 
-            if (!(bool)product.IsDeleted)
+            if (product.IsDeleted == false)
             {
                 product.IsDeleted = true;
                 product.TotalStock = 0;

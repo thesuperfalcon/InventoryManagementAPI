@@ -1,7 +1,6 @@
 ﻿using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client.Extensions.Msal;
 
 namespace InventoryManagementAPI.DAL
 {

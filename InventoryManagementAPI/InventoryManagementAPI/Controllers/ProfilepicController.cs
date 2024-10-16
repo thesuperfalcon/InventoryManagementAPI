@@ -40,7 +40,6 @@ namespace InventoryManagementAPI.Controllers
 
         private int ExtractNumberFromFile(string url)
         {
-            //Använder Regex för att sortera filerna i nummerordning
 
             string fileName = url.Substring(url.LastIndexOf('/') + 1);
             Match match = Regex.Match(fileName, @"\d+");

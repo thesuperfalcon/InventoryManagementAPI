@@ -39,7 +39,7 @@ namespace InventoryManagementAPI.Controllers
 
         // POST: api/log
         [HttpPost]
-        public async Task<ActionResult<Log>> PostLog(Log log)
+        public async Task<ActionResult<Log>> PostLog(Models.Log log)
         {
             _context.Logs.Add(log);
             await _context.SaveChangesAsync();
@@ -49,7 +49,7 @@ namespace InventoryManagementAPI.Controllers
 
         // PUT: api/log/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLog(int id, Log log)
+        public async Task<IActionResult> PutLog(int id, Models.Log log)
         {
             if (id != log.Id)
             {

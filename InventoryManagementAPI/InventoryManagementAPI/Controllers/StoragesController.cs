@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
@@ -94,8 +89,6 @@ namespace InventoryManagementAPI.Controllers
 
                 query = query.Where(x => x.IsDeleted == false && (
                 searchTerms.All(term => x.Name.Contains(term))));
-
-                // lägg till fler searchTerms ifall man vill kunna söka fler atributer
             }
 
             var storages = await query.ToListAsync();
@@ -119,7 +112,7 @@ namespace InventoryManagementAPI.Controllers
                 return NotFound();
             }
 
-            if (!(bool)storage.IsDeleted)
+            if (storage.IsDeleted == false)
             {
                 storage.IsDeleted = true;
             }

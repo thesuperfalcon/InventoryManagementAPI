@@ -100,64 +100,6 @@ namespace InventoryManagementAPI.Data
                 }
             }
         }
-        public async Task SeedTestDataAsync()
-        {
-            if (await Products.AnyAsync() && await Storages.AnyAsync())
-            {
-                return; 
-            }
-
-            var product = new Product
-            {
-                Name = "Testprodukt",
-                ArticleNumber = "TP001",
-                CurrentStock = 50,
-                TotalStock = 50,
-                Description = "Detta är en testprodukt.",
-                Price = 99.99m,
-                Created = DateTime.UtcNow,
-                Updated = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            Products.Add(product);
-            await SaveChangesAsync(); 
-
-            var storage1 = new Storage
-            {
-                Name = "Lager 1",
-                CurrentStock = 0,
-                MaxCapacity = 200,
-                Created = DateTime.UtcNow,
-                Updated = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            var storage2 = new Storage
-            {
-                Name = "Lager 2",
-                CurrentStock = 0,
-                MaxCapacity = 200,
-                Created = DateTime.UtcNow,
-                Updated = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            Storages.AddRange(storage1, storage2);
-            await SaveChangesAsync(); 
-
-            var storageDefault = Storages.Where(x => x.Name == "Standardlager").FirstOrDefault();
-
-            var inventoryTracker1 = new InventoryTracker
-            {
-                StorageId = storageDefault.Id,
-                ProductId = product.Id,
-                Quantity = 50
-            };
-
-            InventoryTracker.AddRange(inventoryTracker1);
-            await SaveChangesAsync(); 
-        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
