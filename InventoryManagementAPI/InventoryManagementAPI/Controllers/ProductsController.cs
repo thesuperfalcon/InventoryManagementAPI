@@ -20,16 +20,24 @@ namespace InventoryManagementAPI.Controllers
             _context = context;
             _productManager = productManager;
         }
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Models.Product products)
-        {
-            _context.Products.Add(products);
-            await _context.SaveChangesAsync();
-            await _productManager.SendProductToDefaultStorageAsync(products.Id, products);
-            return Ok();
-        }
+		[HttpPost]
+		public async Task<IActionResult> Post([FromBody] Models.Product product)
+		{
+			if (product == null)
+			{
+				return BadRequest("Product cannot be null.");
+			}
 
-        [HttpPut("{id}")]
+			_context.Products.Add(product);
+
+			await _context.SaveChangesAsync();
+
+			await _productManager.SendProductToDefaultStorageAsync(product.Id, product);
+
+			return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+		}
+
+		[HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Models.Product products)
         {
             await _productManager.UpdateProductAsync(id, products);

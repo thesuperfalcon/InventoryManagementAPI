@@ -35,32 +35,24 @@ namespace InventoryManagementAPI.DAL
             }
         }
 
-        public async Task<List<InventoryTracker>> GetTrackersByStorageAndProductIdAsync(int? productId, int? storageId)
-        {
-            List<InventoryTracker> inventoryTrackers = await _context.InventoryTracker.ToListAsync();
+		public async Task<List<InventoryTracker>> GetTrackersByStorageAndProductIdAsync(int? productId, int? storageId)
+		{
+			var query = _context.InventoryTracker.AsQueryable();
 
-            List<InventoryTracker> selectedInventoryTrackers = new List<InventoryTracker>();
+			query = query.Include(x => x.Product)
+						 .Include(x => x.Storage);
 
+			if (productId.HasValue && productId > 0)
+			{
+				query = query.Where(x => x.ProductId == productId);
+			}
 
-            switch (productId, storageId)
-            {
-                case (int inputProduct, int inputStorage) when inputProduct > 0 && inputStorage <= 0:
-                    selectedInventoryTrackers = inventoryTrackers.Where(x => x.ProductId == inputProduct).ToList();
-                    break;
+			if (storageId.HasValue && storageId > 0)
+			{
+				query = query.Where(x => x.StorageId == storageId);
+			}
 
-                case (int inputProduct, int inputStorage) when inputStorage > 0 && inputProduct <= 0:
-                    selectedInventoryTrackers = inventoryTrackers.Where(x => x.StorageId == inputStorage).ToList();
-                    break;
-
-                case (int inputProduct, int inputStorage) when inputProduct > 0 && inputStorage > 0:
-                    selectedInventoryTrackers = inventoryTrackers.Where(x => x.StorageId == inputStorage && x.ProductId == inputProduct).ToList();
-                    break;
-
-                default:
-                    break;
-            }
-
-            return selectedInventoryTrackers;
-        }
-    }
+			return await query.ToListAsync();
+		}
+	}
 }

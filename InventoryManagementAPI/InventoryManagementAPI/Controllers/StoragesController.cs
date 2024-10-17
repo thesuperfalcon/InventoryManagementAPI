@@ -19,14 +19,21 @@ namespace InventoryManagementAPI.Controllers
             _storageManager = storageManager;
         }
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Models.Storage storages)
+        public async Task<IActionResult> Post([FromBody] Models.Storage storage)
         {
-            _context.Storages.Add(storages);
+            if(storage == null)
+            {
+                return BadRequest("Storage cannot be null");
+            }
+
+            _context.Storages.Add(storage);
+
             await _context.SaveChangesAsync();
-            return Ok();
-        }
-        
-        [HttpPut("{id}")]
+
+			return CreatedAtAction(nameof(GetStorageById), new { id = storage.Id }, storage);
+		}
+
+		[HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Models.Storage storages)
         {
             await _storageManager.UpdateStoragesAsync(id, storages);
