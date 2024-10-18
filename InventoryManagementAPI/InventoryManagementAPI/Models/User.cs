@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+#nullable enable
 
 namespace InventoryManagementAPI.Models
 {
@@ -29,7 +30,7 @@ namespace InventoryManagementAPI.Models
 
         [JsonPropertyName("created")]
         [PersonalData]
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
 
         [JsonPropertyName("updated")]
         [PersonalData]
