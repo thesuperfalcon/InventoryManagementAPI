@@ -1,8 +1,9 @@
 ﻿using System.Text.Json.Serialization;
+#nullable enable
 
 namespace InventoryManagementAPI.Models
 {
-	public class InventoryTracker
+	public record InventoryTracker
 	{
 		[JsonPropertyName("id")]
 		public int Id { get; set; }
@@ -17,7 +18,8 @@ namespace InventoryManagementAPI.Models
 		public int? Quantity { get; set; }
 
 		[JsonPropertyName("modified")]
-		public DateTime? Modified { get; set; }
+		public DateTime? Modified { get; set; } = DateTime.Now;
+
 		[JsonPropertyName("product")]
 		public virtual Product? Product { get; set; }
 

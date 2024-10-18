@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+#nullable enable
 
 namespace InventoryManagementAPI.Models
 {
@@ -17,12 +18,14 @@ namespace InventoryManagementAPI.Models
         public int? CurrentStock { get; set; }
 
         [JsonPropertyName("created")]
-        public DateTime? Created { get; set; }
+        public DateTime? Created { get; set; } = DateTime.Now;
 
         [JsonPropertyName("updated")]
         public DateTime? Updated { get; set; }
+
         [JsonPropertyName("isDeleted")]
         public bool? IsDeleted { get; set; } = false;
+
         [JsonPropertyName("inventoryTrackers")]
         public virtual ICollection<InventoryTracker> InventoryTrackers { get; set; } = new List<InventoryTracker>();
     }
