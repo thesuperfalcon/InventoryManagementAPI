@@ -3,7 +3,7 @@
 
 namespace InventoryManagementAPI.Models
 {
-    public class Log
+    public record Log
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
