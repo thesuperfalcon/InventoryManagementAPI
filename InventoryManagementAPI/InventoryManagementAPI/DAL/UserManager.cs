@@ -90,5 +90,30 @@ namespace InventoryManagementAPI.DAL
                 }
             }
         }
+
+        public async Task<User> FindByIdAsync(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException($"User with ID {id} not found.");
+            }
+
+            return user;
+        }
+
+        public async Task<List<string>> GetRolesAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"User with ID {userId} not found.");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return roles.ToList();
+        }
     }
 }

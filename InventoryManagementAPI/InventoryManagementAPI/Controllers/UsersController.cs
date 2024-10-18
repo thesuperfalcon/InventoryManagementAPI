@@ -115,5 +115,23 @@ namespace InventoryManagementAPI.Controllers
             return Ok();
         }
 
+        [HttpGet("UserRole/{id}")]
+        public async Task<IActionResult> GetRoleAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if(user == null)
+            {
+                return NotFound($"User with ID {id} not found.");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user.Id);
+
+            if (roles == null || !roles.Any())
+            {
+                return NotFound($"User with ID {id} is just a normal user.");
+            }
+            return Ok(roles);
+        }
     }
 }
