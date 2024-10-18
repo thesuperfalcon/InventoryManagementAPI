@@ -29,9 +29,6 @@ namespace InventoryManagementAPI.DAL
 
                 _context.Storages.Update(existingStorage);
                 await _context.SaveChangesAsync();
-
-                Console.WriteLine(existingStorage.CurrentStock + "har ändrats!!!!");
-                
             }
         }
     }

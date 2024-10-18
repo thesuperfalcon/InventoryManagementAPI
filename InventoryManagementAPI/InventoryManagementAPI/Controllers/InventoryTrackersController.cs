@@ -1,10 +1,6 @@
 ﻿using InventoryManagementAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using Microsoft.Extensions.Options;
-using InventoryManagementAPI.DTO;
 using InventoryManagementAPI.DAL;
 
 namespace InventoryManagementAPI.Controllers
@@ -24,7 +20,7 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] InventoryTrackerDto inventoryTrackerDto)
+        public async Task<IActionResult> Post([FromBody] DTO.InventoryTrackerDto inventoryTrackerDto)
         {
             if (inventoryTrackerDto == null)
             {
@@ -74,7 +70,7 @@ namespace InventoryManagementAPI.Controllers
         {
 
             var invntoryTracker = await _trackerManager.GetTrackersByStorageAndProductIdAsync(productId, storageId);
-            if(invntoryTracker.Count <= 0)
+            if (invntoryTracker.Count <= 0)
             {
                 return BadRequest("inga inventorytrackers hittades på dina input idn");
             }

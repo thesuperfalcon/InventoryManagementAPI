@@ -15,5 +15,7 @@ namespace InventoryManagementAPI.DTO
 
         [JsonPropertyName("resetPassword")]
         public bool ResetPassword { get; set; }
+        [JsonPropertyName("isDeleted")]
+        public bool IsDeleted { get; set; }
     }
 }

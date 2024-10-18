@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
-using System.Text.Json.Serialization;
-using System.Text.Json;
+
 using InventoryManagementAPI.DAL;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 
 namespace InventoryManagementAPI.Controllers
 {
@@ -26,16 +20,24 @@ namespace InventoryManagementAPI.Controllers
             _context = context;
             _productManager = productManager;
         }
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Models.Product products)
-        {
-            _context.Products.Add(products);
-            await _context.SaveChangesAsync();
-            await _productManager.SendProductToDefaultStorageAsync(products.Id, products);
-            return Ok();
-        }
+		[HttpPost]
+		public async Task<IActionResult> Post([FromBody] Models.Product product)
+		{
+			if (product == null)
+			{
+				return BadRequest("Product cannot be null.");
+			}
 
-        [HttpPut("{id}")]
+			_context.Products.Add(product);
+
+			await _context.SaveChangesAsync();
+
+			await _productManager.SendProductToDefaultStorageAsync(product.Id, product);
+
+			return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+		}
+
+		[HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Models.Product products)
         {
             await _productManager.UpdateProductAsync(id, products);
@@ -72,18 +74,20 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchProducts")]
-        public async Task<IActionResult> SearchProducts(string name, string? articleNumber)
+        public async Task<IActionResult> SearchProducts(string? inputValue)
         {
             var query = _context.Products.AsQueryable();
 
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrWhiteSpace(inputValue))
             {
-                query = query.Where(x => x.Name.Contains(name));
-            }
+                var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (!string.IsNullOrEmpty(articleNumber))
-            {
-                query = query.Where(x => x.ArticleNumber.Contains(articleNumber));
+                query = query.Where(x => x.IsDeleted == false && (
+                searchTerms.All(term => x.Name.Contains(term)) ||
+                searchTerms.All(term => x.ArticleNumber.Contains(term)) ||
+                searchTerms.All(term => x.Description.Contains(term)) ||
+                searchTerms.All(term => x.Price.ToString().Contains(term)) ||
+                searchTerms.All(term => x.TotalStock.ToString().Contains(term))));
             }
 
             var products = await query.ToListAsync();
@@ -103,6 +107,12 @@ namespace InventoryManagementAPI.Controllers
         {
             return await _context.Products.Where(x => x.IsDeleted == true).FirstOrDefaultAsync(x => x.Id == id);
         }
+        [HttpGet("ProductByName/{name}")]
+        public async Task<bool> GetProductByName(string name)
+        {
+            var product = await _context.Products.Where(x => x.Name == name && x.IsDeleted == false).FirstOrDefaultAsync();
+            return product != null ? true : false;
+        }
 
 
         [HttpDelete("{id}")]
@@ -115,9 +125,11 @@ namespace InventoryManagementAPI.Controllers
                 return NotFound();
             }
 
-            if (!(bool)product.IsDeleted)
+            if (product.IsDeleted == false)
             {
                 product.IsDeleted = true;
+                product.TotalStock = 0;
+                product.CurrentStock = 0;
             }
             else
             {

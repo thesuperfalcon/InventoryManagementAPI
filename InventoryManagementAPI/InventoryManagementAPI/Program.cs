@@ -39,6 +39,7 @@ namespace InventoryManagementAPI
             builder.Services.AddScoped<StorageManager>();
             builder.Services.AddScoped<InventoryTrackerManager>();
             builder.Services.AddScoped<ProductManager>();
+            builder.Services.AddScoped<UserManager>();
             //builder.Services.AddScoped<UserManager<User>();
             //builder.Services.AddScoped<RoleManager<Role>();
 
@@ -73,7 +74,6 @@ namespace InventoryManagementAPI
                
                 var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
                 await context.CreateDefaultSlot();
-                await context.SeedTestDataAsync();
                 await context.SeedRolesAndAdminUser(roleManager, userManager);
                 
                 //await Data.InventoryManagementAPIContext.SeedRolesAndAdminUser(roleManager, userManager);

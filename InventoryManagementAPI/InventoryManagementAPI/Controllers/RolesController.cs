@@ -21,14 +21,7 @@ namespace InventoryManagementAPI.Controllers
 		public async Task<List<Models.Role>> GetRolesAsync()
 		{
 			List<Models.Role> roles = await _context.AspNetRoles.ToListAsync();
-   //         return roles.Select(r => new Models.Role
-			//{
-			//	Id = r.Id,
-			//	RoleName = r.RoleName,
-			//	FullAccess = r.FullAccess
 
-
-			//}).ToList();
 			return roles;
 		}
 

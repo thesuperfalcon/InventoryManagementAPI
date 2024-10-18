@@ -1,4 +1,5 @@
-﻿using InventoryManagementAPI.Data;
+﻿using InventoryManagementAPI.DAL;
+using InventoryManagementAPI.Data;
 using InventoryManagementAPI.DTO;
 using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
@@ -16,10 +17,10 @@ namespace InventoryManagementAPI.Controllers
 
         private readonly InventoryManagementAPIContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager _userManager;
 
 
-        public UsersController(InventoryManagementAPIContext context, UserManager<User> userManager )
+        public UsersController(InventoryManagementAPIContext context, UserManager userManager)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
@@ -28,88 +29,16 @@ namespace InventoryManagementAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Models.User user)
         {
+            await _userManager.CreateUser(user);
             
-            user.Id = Guid.NewGuid().ToString();
-
-            string firstTwoLettersFirstName = user.FirstName.Length >= 2 ? user.FirstName.Substring(0, 2).ToLower() : user.FirstName.ToLower();
-            string firstTwoLettersLastName = user.LastName.Length >= 2 ? user.LastName.Substring(0, 2).ToLower() : user.LastName.ToLower();
-            user.UserName = $"{firstTwoLettersFirstName}{firstTwoLettersLastName}{user.EmployeeNumber.ToLower()}";
-            //user.UserName = user.EmployeeNumber;
-            user.NormalizedUserName = $"{firstTwoLettersFirstName}{firstTwoLettersLastName}{user.EmployeeNumber.ToLower()}";
-            //user.NormalizedUserName = user.EmployeeNumber;
-
-            //Alicia: test för datum
-            user.Created = DateTime.Now;
-
-            user.RoleId = null;
-            user.PasswordHash = _passwordHasher.HashPassword(user, "Admin123!");
-            user.EmailConfirmed = false;
-            user.ProfilePic = "https://localhost:44353/images/profile1.png";
-			user.TwoFactorEnabled = false;
-            await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
             return Ok();
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody] RoleDTO affectRole)
         {
-            var user = affectRole.User;
+            await _userManager.UpdateUser(affectRole);
 
-            // Av någon anledning sparar den inte in i databasen om jag använder user direkt utan måste hämta userToUpdate 
-            // och uppdatera genom den variabeln istället
-
-            var userToUpdate = await _context.Users.FindAsync(user.Id);
-            if (affectRole.CurrentRoles == null && affectRole.AddRole == null && affectRole.ResetPassword == false)
-            {
-                userToUpdate.FirstName = user.FirstName;
-                userToUpdate.LastName = user.LastName;
-                userToUpdate.EmployeeNumber = user.EmployeeNumber;
-                userToUpdate.ProfilePic = user.ProfilePic;
-
-                //Uppdaterar användarnamnet vid ändring av förnamn och/eller efternamn
-                userToUpdate.UserName = user.UserName;
-                userToUpdate.NormalizedUserName = user.NormalizedUserName ?? user.UserName.ToUpper();
-
-                //Visar datumet för updaterad användare
-                userToUpdate.Updated = DateTime.Now;
-
-                _context.Users.Update(userToUpdate);
-                await _context.SaveChangesAsync();
-                return Ok();
-            }
-            else if(affectRole.ResetPassword == true)
-            {
-                // Hårdkodat lösenord vid reset
-                var newPassword = "Admin123!";
-                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(userToUpdate);
-                var resetResult = await _userManager.ResetPasswordAsync(userToUpdate, resetToken, newPassword);
-                return Ok();
-            }
-            else
-            {
-                
-                var rolesToAffect = affectRole.CurrentRoles;
-                var roleToAdd = affectRole.AddRole;
-                if(affectRole.CurrentRoles != null)
-                {
-                    await _userManager.RemoveFromRolesAsync(user, rolesToAffect);
-                    userToUpdate.RoleId = null;
-                    _context.Users.Update(userToUpdate);
-                    await _context.SaveChangesAsync();
-                    return Ok();
-                }
-                else if(roleToAdd != null)
-                {
-                    var roleId = _context.Roles.FirstOrDefault(r => r.Name == roleToAdd);
-                    await _userManager.AddToRoleAsync(userToUpdate, roleToAdd);
-                    userToUpdate.RoleId = roleId.Id;
-                    _context.Users.Update(userToUpdate);
-                    await _context.SaveChangesAsync();
-                    return Ok();
-                }
-                return Ok();                
-            }
+            return Ok();
         }
 
         [HttpGet]
@@ -121,36 +50,23 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchUsers")]
-        public async Task<IActionResult> SearchUsers(string? name, string? employeeNumber)
+        public async Task<IActionResult> SearchUsers(string? inputValue)
         {
             var query = _context.Users.AsQueryable();
 
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrWhiteSpace(inputValue))
             {
-                query = query.Where(x => EF.Functions.Like((x.FirstName + " " + x.LastName).ToLower(), $"%{name.ToLower()}%"));
+                var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                query = query.Where(x => x.IsDeleted == false && (
+                searchTerms.All(term => x.FirstName.Contains(term)) ||
+                searchTerms.All(term => x.LastName.Contains(term)) ||
+                searchTerms.All(term => x.UserName.Contains(term)) ||
+                searchTerms.All(term => x.EmployeeNumber.Contains(term))));
+
+                // lägg till fler searchTerms ifall man vill kunna söka fler atributer
+
             }
-
-            if (!string.IsNullOrEmpty(employeeNumber))
-            {
-                query = query.Where(x => EF.Functions.Like(x.EmployeeNumber, $"%{employeeNumber}%"));
-            }
-
-
-            //if (!string.IsNullOrEmpty(name))
-            //{
-            //    query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
-            //}
-
-            //if (!string.IsNullOrEmpty(lastName))
-            //{
-            //    query = query.Where(x => x.LastName.ToLower().Contains(lastName.ToLower()));
-            //}
-
-            //if (!string.IsNullOrEmpty(employeeNumber))
-            //{
-            //    query = query.Where(x => x.EmployeeNumber.Contains(employeeNumber));
-            //}
-
 
             var users = await query.ToListAsync();
 
@@ -179,25 +95,43 @@ namespace InventoryManagementAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            
+
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-            if(user.IsDeleted == false)
+            if (user.IsDeleted == false)
             {
                 user.IsDeleted = true;
                 _context.Users.Update(user);
             }
             else
             {
-				_context.Users.Remove(user);
-			}
-           
+                _context.Users.Remove(user);
+            }
+
             await _context.SaveChangesAsync();
             return Ok();
         }
 
+        [HttpGet("UserRole/{id}")]
+        public async Task<IActionResult> GetRoleAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if(user == null)
+            {
+                return NotFound($"User with ID {id} not found.");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user.Id);
+
+            if (roles == null || !roles.Any())
+            {
+                return NotFound($"User with ID {id} is just a normal user.");
+            }
+            return Ok(roles);
+        }
     }
 }

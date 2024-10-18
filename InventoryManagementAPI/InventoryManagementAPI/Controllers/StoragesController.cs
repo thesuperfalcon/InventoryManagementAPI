@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagementAPI.Data;
 using InventoryManagementAPI.Models;
@@ -24,14 +19,21 @@ namespace InventoryManagementAPI.Controllers
             _storageManager = storageManager;
         }
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Models.Storage storages)
+        public async Task<IActionResult> Post([FromBody] Models.Storage storage)
         {
-            _context.Storages.Add(storages);
+            if(storage == null)
+            {
+                return BadRequest("Storage cannot be null");
+            }
+
+            _context.Storages.Add(storage);
+
             await _context.SaveChangesAsync();
-            return Ok();
-        }
-        
-        [HttpPut("{id}")]
+
+			return CreatedAtAction(nameof(GetStorageById), new { id = storage.Id }, storage);
+		}
+
+		[HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Models.Storage storages)
         {
             await _storageManager.UpdateStoragesAsync(id, storages);
@@ -52,9 +54,10 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("ByStorageName/{storageName}")]
-        public async Task<Models.Storage> GetStorageByNameAsync(string storageName)
+        public async Task<bool> GetStorageByNameAsync(string storageName)
         {
-            return await _context.Storages.FirstOrDefaultAsync(x => x.Name == storageName);
+            var storage = await _context.Storages.FirstOrDefaultAsync(x => x.Name == storageName && x.IsDeleted == false);
+            return storage != null ? true : false;
         }
 
         [HttpGet("{id}")]
@@ -83,13 +86,16 @@ namespace InventoryManagementAPI.Controllers
         }
 
         [HttpGet("SearchStorages")]
-        public async Task<IActionResult> SearchStorages(string? name)
+        public async Task<IActionResult> SearchStorages(string? inputValue)
         {
             var query = _context.Storages.AsQueryable();
 
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(inputValue))
             {
-                query = query.Where(x => x.Name.Contains(name));
+                var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                query = query.Where(x => x.IsDeleted == false && (
+                searchTerms.All(term => x.Name.Contains(term))));
             }
 
             var storages = await query.ToListAsync();
@@ -113,7 +119,7 @@ namespace InventoryManagementAPI.Controllers
                 return NotFound();
             }
 
-            if (!(bool)storage.IsDeleted)
+            if (storage.IsDeleted == false)
             {
                 storage.IsDeleted = true;
             }

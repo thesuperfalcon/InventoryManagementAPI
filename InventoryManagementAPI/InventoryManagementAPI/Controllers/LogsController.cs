@@ -23,8 +23,23 @@ namespace InventoryManagementAPI.Controllers
             return await _context.Logs.ToListAsync();
         }
 
-        // GET: api/log/5
-        [HttpGet("{id}")]
+		[HttpGet("{entityType}/{entityId}")]
+		public async Task<ActionResult<List<Log>>> GetLogByTypeAndId(string entityType, int entityId)
+		{
+			var logs = await _context.Logs
+				.Where(x => x.EntityType == entityType && x.EntityId == entityId)
+				.ToListAsync();
+
+			if (logs == null || !logs.Any())
+			{
+				return NotFound();
+			}
+
+			return logs;
+		}
+
+		// GET: api/log/5
+		[HttpGet("{id}")]
         public async Task<ActionResult<Log>> GetLog(int id)
         {
             var log = await _context.Logs.FindAsync(id);
@@ -39,7 +54,7 @@ namespace InventoryManagementAPI.Controllers
 
         // POST: api/log
         [HttpPost]
-        public async Task<ActionResult<Log>> PostLog(Log log)
+        public async Task<ActionResult<Log>> PostLog(Models.Log log)
         {
             _context.Logs.Add(log);
             await _context.SaveChangesAsync();
@@ -49,7 +64,7 @@ namespace InventoryManagementAPI.Controllers
 
         // PUT: api/log/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLog(int id, Log log)
+        public async Task<IActionResult> PutLog(int id, Models.Log log)
         {
             if (id != log.Id)
             {
