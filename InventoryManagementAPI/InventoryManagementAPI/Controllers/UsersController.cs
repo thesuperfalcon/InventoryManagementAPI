@@ -58,11 +58,11 @@ namespace InventoryManagementAPI.Controllers
             {
                 var searchTerms = inputValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                query = query.Where(x => x.IsDeleted == false && (
-                searchTerms.All(term => x.FirstName.Contains(term)) ||
-                searchTerms.All(term => x.LastName.Contains(term)) ||
-                searchTerms.All(term => x.UserName.Contains(term)) ||
-                searchTerms.All(term => x.EmployeeNumber.Contains(term))));
+                query = query.Where(x => x.IsDeleted == false && searchTerms.All(term =>
+                x.FirstName.Contains(term) ||
+                x.LastName.Contains(term) ||
+                x.UserName.Contains(term) ||
+                x.EmployeeNumber.Contains(term)));
 
                 // lägg till fler searchTerms ifall man vill kunna söka fler atributer
 
