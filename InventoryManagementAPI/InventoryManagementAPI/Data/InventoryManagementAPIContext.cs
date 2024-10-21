@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using InventoryManagementAPI.Models;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System.Reflection.Emit;
-using Microsoft.Build.Framework;
+﻿using InventoryManagementAPI.Models;
 using Microsoft.AspNetCore.Identity;
-using InventoryManagementAPI.Controllers;
-using System.Data;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagementAPI.Data
 {
@@ -19,22 +9,24 @@ namespace InventoryManagementAPI.Data
     {
 
 
-        public InventoryManagementAPIContext (DbContextOptions<InventoryManagementAPIContext> options)
+        public InventoryManagementAPIContext(DbContextOptions<InventoryManagementAPIContext> options)
             : base(options)
         {
         }
 
         public DbSet<InventoryManagementAPI.Models.Product> Products { get; set; }
         public DbSet<InventoryManagementAPI.Models.Storage> Storages { get; set; }
-        public DbSet<InventoryManagementAPI.Models.Statistic> Statistics { get; set; } 
+        public DbSet<InventoryManagementAPI.Models.Statistic> Statistics { get; set; }
         public DbSet<InventoryManagementAPI.Models.InventoryTracker> InventoryTracker { get; set; }
-        public DbSet<InventoryManagementAPI.Models.Role> AspNetRoles {  get; set; }
-        public DbSet<InventoryManagementAPI.Models.User> Users {  get; set; }
+        public DbSet<InventoryManagementAPI.Models.Role> AspNetRoles { get; set; }
+        public DbSet<InventoryManagementAPI.Models.User> Users { get; set; }
         public DbSet<InventoryManagementAPI.Models.Log> Logs { get; set; }
+
+        public DbSet<InventoryManagementAPI.Models.Developer> Developers { get; set; }
 
         public async Task CreateDefaultSlot()
         {
-            if(await Storages.AnyAsync())
+            if (await Storages.AnyAsync())
             {
                 return;
             }
@@ -52,11 +44,75 @@ namespace InventoryManagementAPI.Data
             Storages.Add(defaultSlot);
             await SaveChangesAsync();
         }
-        public  async Task SeedRolesAndAdminUser(RoleManager<Role> roleManager, UserManager<User> userManager)
+
+        public async Task SeedDevelopers()
+        {
+            if (await Developers.AnyAsync())
+            {
+                return;
+            }
+
+            var developers = new List<Developer>
+            {
+                new Developer
+                {
+                    Name = "Gustav Berg",
+                    ImageUrl = "gb.jpg",
+                    Title = "Lia student",
+                    GithubUrl = "https://github.com/gurranb",
+                    LinkedInUrl = "https://www.linkedin.com/in/gustav-berg7/"
+                },
+                new Developer
+                {
+                    Name = "Tim Tallberg",
+                    ImageUrl = "tt.jpg",
+                    Title = "Lia student",
+                    GithubUrl = "https://github.com/Tallis92",
+                    LinkedInUrl = "https://www.linkedin.com/in/tim-tallberg/"
+                },
+                new Developer
+                {
+                    Name = "Alicia Blomqvist",
+                    ImageUrl = "ab.jpg",
+                    Title = "Lia student",
+                    GithubUrl = "https://github.com/aliciablomqvist",
+                    LinkedInUrl = "https://www.linkedin.com/in/alicia-blomqvist-43624a242/"
+                },
+                new Developer
+                {
+                    Name = "Tintin Falk",
+                    ImageUrl = "tf.jpg",
+                    Title = "Lia student",
+                    GithubUrl = "https://github.com/thesuperfalcon",
+                    LinkedInUrl = "https://www.linkedin.com/in/tintinfalk/"
+                },
+                new Developer
+                {
+                    Name = "Elin Sand",
+                    ImageUrl = "es.jpg",
+                    Title = "Lia student",
+                    GithubUrl = "https://github.com/ElinSand",
+                    LinkedInUrl = "https://www.linkedin.com/in/elin-sand-43b9732a3/"
+                },             
+                new Developer
+                {
+                    Name = "Robin Jonsson",
+                    ImageUrl = "rj.jpg",
+                    Title = "Lia student",
+                    GithubUrl = "https://github.com/ilhobbito",
+                    LinkedInUrl = "https://www.linkedin.com/in/jonsson-robin/"
+                }
+            };
+
+            Developers.AddRange(developers);
+            await SaveChangesAsync();
+        }
+
+        public async Task SeedRolesAndAdminUser(RoleManager<Role> roleManager, UserManager<User> userManager)
         {
 
             var roles = new[] { "Admin" };
-            
+
             // Skapa roller
             foreach (var role in roles)
             {
@@ -73,7 +129,7 @@ namespace InventoryManagementAPI.Data
 
                 }
             }
-           
+
             // Om admin inte finns, skapa rollen vid start
             var adminUserName = "AdminUser";
             var adminPassword = "AdminUser123!";
@@ -95,7 +151,7 @@ namespace InventoryManagementAPI.Data
 
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
                 if (result.Succeeded)
-                {                   
+                {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
                 }
             }
