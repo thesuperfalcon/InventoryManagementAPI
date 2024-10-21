@@ -34,7 +34,7 @@ namespace InventoryManagementAPI.Data
             var defaultSlot = new Storage
             {
                 Name = "Standardlager",
-                CurrentStock = 50,
+                CurrentStock = 0,
                 MaxCapacity = null,
                 Created = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
