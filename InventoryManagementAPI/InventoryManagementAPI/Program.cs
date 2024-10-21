@@ -75,6 +75,7 @@ namespace InventoryManagementAPI
                 var context = scope.ServiceProvider.GetRequiredService<InventoryManagementAPIContext>();
                 await context.CreateDefaultSlot();
                 await context.SeedRolesAndAdminUser(roleManager, userManager);
+                await context.SeedDevelopers();
                 
                 //await Data.InventoryManagementAPIContext.SeedRolesAndAdminUser(roleManager, userManager);
             }
