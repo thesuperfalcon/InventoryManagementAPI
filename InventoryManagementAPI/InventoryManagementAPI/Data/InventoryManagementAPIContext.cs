@@ -89,10 +89,10 @@ namespace InventoryManagementAPI.Data
                 new Developer
                 {
                     Name = "Elin Sand",
-                    ImageUrl = "es.jpg",
+                    ImageUrl = "es1.jpg",
                     Title = "Lia student",
                     GithubUrl = "https://github.com/ElinSand",
-                    LinkedInUrl = "https://www.linkedin.com/in/elin-sand-43b9732a3/"
+                    LinkedInUrl = "https://www.linkedin.com/in/elin-sand"
                 },             
                 new Developer
                 {
